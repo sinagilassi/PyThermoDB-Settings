@@ -11,10 +11,16 @@ from pydantic import (
     Field,
     ConfigDict
 )
-# locals
+# local
+from .configs import ComponentConfig
+from .rules import ComponentRule
 from .components import Component
 
+# NOTE: custom reference models
+CustomReference = Dict[str, List[str]]
 
+
+# NOTE: reference thermodb model
 class ReferenceThermoDB(BaseModel):
     """
     Model for reference thermodynamic database (ThermoDB).
@@ -25,12 +31,16 @@ class ReferenceThermoDB(BaseModel):
         Dictionary of references with their associated contents.
     contents : List[str]
         List of reference contents used for building the thermodynamic database.
-    configs : Dict[str, Any]
+    configs : Dict[str, ComponentConfig]
         Reference configuration used for building the thermodynamic database.
-    rules : Dict[str, Any]
+    rules : ComponentRule
         Reference rules generated from the reference configuration.
     labels : Optional[List[str]]
         List of labels used in the reference config.
+    ignore_labels : Optional[List[str]]
+        List of property labels to ignore state during the build.
+    ignore_props : Optional[List[str]]
+        List of property names to ignore state during the build.
 
     Notes
     -----
@@ -46,11 +56,11 @@ class ReferenceThermoDB(BaseModel):
         ...,
         description="List of reference contents used for building the thermodynamic database."
     )
-    configs: Dict[str, Any] = Field(
+    configs: Dict[str, ComponentConfig] = Field(
         default_factory=dict,
         description="Reference configuration used for building the thermodynamic database."
     )
-    rules: Dict[str, Any] = Field(
+    rules: Dict[str, ComponentRule] = Field(
         default_factory=dict,
         description="Reference rules generated from the reference configuration."
     )
@@ -72,6 +82,8 @@ class ReferenceThermoDB(BaseModel):
     )
 
 
+# NOTE: component reference thermodb model
+
 class ComponentReferenceThermoDB(BaseModel):
     """
     Model for component thermodynamic database (ThermoDB).
@@ -92,13 +104,46 @@ class ComponentReferenceThermoDB(BaseModel):
     reference_thermodb: ReferenceThermoDB = Field(
         ..., description="Reference thermodynamic database."
     )
-    component_key: Literal[
-        'Name-State', 'Formula-State', 'Name', 'Formula', 'Name-Formula-State'
-    ] = Field(
-        default='Name-State',
-        description="Key to identify the component in the reference content."
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
     )
 
+# NOTE: references thermodb model
+
+
+class ReferencesThermoDB(BaseModel):
+    """
+    Model for references thermodynamic database (ThermoDB).
+    """
+    reference: Dict[str, Dict[str, List[str]]] = Field(
+        ...,
+        description="Dictionary of references with their associated contents."
+    )
+    contents: Dict[str, List[str]] = Field(
+        ...,
+        description="List of reference contents used for building the thermodynamic database."
+    )
+    configs: Dict[str, Dict[str, ComponentConfig]] = Field(
+        default_factory=dict,
+        description="Reference configuration used for building the thermodynamic database."
+    )
+    rules: Dict[str, Dict[str, ComponentRule]] = Field(
+        default_factory=dict,
+        description="Reference rules generated from the reference configuration."
+    )
+    labels: Dict[str, List[str]] = Field(
+        default_factory=dict,
+        description="Dictionary of labels used in the reference config."
+    )
+    ignore_labels: Dict[str, List[str]] = Field(
+        default_factory=dict,
+        description="Dictionary of property labels to ignore state during the build."
+    )
+    ignore_props: Dict[str, List[str]] = Field(
+        default_factory=dict,
+        description="Dictionary of property names to ignore state during the build."
+    )
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
     )
