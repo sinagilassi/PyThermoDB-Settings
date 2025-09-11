@@ -1,5 +1,4 @@
-# export
-from .configs.about import (
+from .about import (
     __version__,
     __description__,
     __author__,
