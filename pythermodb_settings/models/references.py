@@ -79,6 +79,7 @@ class ReferenceThermoDB(BaseModel):
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
+        extra="allow"
     )
 
 
@@ -107,6 +108,7 @@ class ComponentReferenceThermoDB(BaseModel):
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
+        extra="allow"
     )
 
 # NOTE: references thermodb model
@@ -146,4 +148,5 @@ class ReferencesThermoDB(BaseModel):
     )
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
+        extra="allow"
     )
