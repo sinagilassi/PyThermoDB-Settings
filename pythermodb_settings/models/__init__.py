@@ -9,6 +9,7 @@ from .references import (
     CustomReference
 )
 from .rules import ComponentRule
+from .source import ComponentThermoDBSource
 
 __all__ = [
     "Component",
@@ -19,5 +20,6 @@ __all__ = [
     "ComponentReferenceThermoDB",
     "ReferencesThermoDB",
     "CustomReference",
-    "ComponentRule"
+    "ComponentRule",
+    "ComponentThermoDBSource"
 ]
