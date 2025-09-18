@@ -1,5 +1,5 @@
 # export
-from .components import Component
+from .components import Component, ComponentIdentity
 from .conditions import Temperature, Pressure
 from .configs import ComponentConfig
 from .references import (
@@ -13,6 +13,7 @@ from .source import ComponentThermoDBSource
 
 __all__ = [
     "Component",
+    "ComponentIdentity",
     "Temperature",
     "Pressure",
     "ComponentConfig",
