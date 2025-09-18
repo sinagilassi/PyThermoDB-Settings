@@ -39,3 +39,24 @@ class Component(BaseModel):
         arbitrary_types_allowed=True,
         extra="allow"
     )
+
+
+class ComponentIdentity(BaseModel):
+    """
+    Model for component identity.
+
+    Attributes
+    ----------
+    name_state : str
+        Component name-state identifier.
+    formula_state : str
+        Component formula-state identifier.
+    """
+    name_state: str = Field(
+        ...,
+        description="Component name-state identifier"
+    )
+    formula_state: str = Field(
+        ...,
+        description="Component formula-state identifier"
+    )
