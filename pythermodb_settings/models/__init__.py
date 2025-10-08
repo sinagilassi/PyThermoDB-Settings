@@ -6,7 +6,8 @@ from .references import (
     ReferenceThermoDB,
     ComponentReferenceThermoDB,
     ReferencesThermoDB,
-    CustomReference
+    CustomReference,
+    MixtureReferenceThermoDB
 )
 from .rules import ComponentRule
 from .source import ComponentThermoDBSource
@@ -21,6 +22,7 @@ __all__ = [
     "ComponentReferenceThermoDB",
     "ReferencesThermoDB",
     "CustomReference",
+    "MixtureReferenceThermoDB",
     "ComponentRule",
     "ComponentThermoDBSource"
 ]
