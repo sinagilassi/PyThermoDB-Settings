@@ -231,9 +231,15 @@ def create_binary_mixture_id(
 def create_mixture_id(
     components: list[Component],
     mixture_key: Literal[
-        'Name', 'Formula', 'Name-State', 'Formula-State',
+        'Name',
+        'Formula',
+        'Name-State',
+        'Formula-State',
+        'Name-Formula-State',
+        'Formula-Name-State'
     ] = 'Name',
-    delimiter: str = "|"
+    delimiter: str = "|",
+    case: Literal['lower', 'upper', None] = None
 ) -> str:
     """Create a unique mixture ID based on a list of components (sorted alphabetically).
 
@@ -241,10 +247,12 @@ def create_mixture_id(
     ----------
     components : list[Component]
         List of components in the mixture.
-    component_key : Literal['Name', 'Formula', 'Name-State', 'Formula-State'], optional
+    component_key : Literal['Name', 'Formula', 'Name-State', 'Formula-State', 'Name-Formula-State', 'Formula-Name-State'], optional
         The key to use for identifying the components, by default 'Name'.
     delimiter : str, optional
         Delimiter to separate the components in the ID, by default "|".
+    case : Literal['lower', 'upper', None], optional
+        Convert the identifier to lower or upper case, by default 'lower'.
 
     Returns
     -------
@@ -287,24 +295,37 @@ def create_mixture_id(
         component_ids = []
         for comp in components:
             if mixture_key == 'Name':
-                comp_id = comp.name.strip().lower()
+                comp_id = comp.name.strip()
             elif mixture_key == 'Formula':
-                comp_id = comp.formula.strip().lower()
+                comp_id = comp.formula.strip()
             elif mixture_key == 'Name-State':
-                comp_id = f"{comp.name.strip().lower()}-{comp.state.strip().lower()}"
+                comp_id = f"{comp.name.strip()}-{comp.state.strip()}"
             elif mixture_key == 'Formula-State':
-                comp_id = f"{comp.formula.strip().lower()}-{comp.state.strip().lower()}"
+                comp_id = f"{comp.formula.strip()}-{comp.state.strip()}"
+            elif mixture_key == 'Name-Formula-State':
+                comp_id = f"{comp.name.strip()}-{comp.formula.strip()}-{comp.state.strip()}"
+            elif mixture_key == 'Formula-Name-State':
+                comp_id = f"{comp.formula.strip()}-{comp.name.strip()}-{comp.state.strip()}"
             else:
                 raise ValueError(
-                    "component_key must be either 'Name' or 'Formula'"
+                    "component_key must be one of the following: Name, Formula, Name-State, Formula-State, Name-Formula-State, Formula-Name-State"
                 )
             component_ids.append(comp_id)
 
         # SECTION: create unique mixture ID (sorted to ensure uniqueness)
+        # ! sorted alphabetically
         mixture_id = delimiter.join(sorted(component_ids))
 
         # strip
         mixture_id = mixture_id.strip()
+
+        # NOTE: apply conversion
+        if case == 'lower':
+            mixture_id = mixture_id.lower()
+        elif case == 'upper':
+            mixture_id = mixture_id.upper()
+        elif case is None:
+            pass
 
         # return
         return mixture_id
