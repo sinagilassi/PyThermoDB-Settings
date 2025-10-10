@@ -187,3 +187,88 @@ def create_binary_mixture_id(
     except Exception as e:
         logging.error(f"Error in create_binary_mixture_id: {e}")
         raise
+
+
+def create_mixture_id(
+    components: list[Component],
+    mixture_key: Literal[
+        'Name', 'Formula', 'Name-State', 'Formula-State',
+    ] = 'Name',
+    delimiter: str = "|"
+) -> str:
+    """Create a unique mixture ID based on a list of components (sorted alphabetically).
+
+    Parameters
+    ----------
+    components : list[Component]
+        List of components in the mixture.
+    component_key : Literal['Name', 'Formula'], optional
+        The key to use for identifying the components, by default 'Name'.
+    delimiter : str, optional
+        Delimiter to separate the components in the ID, by default "|".
+
+    Returns
+    -------
+    str
+        A unique mixture ID.
+
+    Raises
+    ------
+    ValueError
+        If the component_key is not recognized.
+
+    Examples
+    --------
+    The following example creates a mixture ID for water, ethanol, and methanol
+    using their names:
+
+    >>> comp1 = Component(name="Water", formula="H2O", state="l")
+    >>> comp2 = Component(name="Ethanol", formula="C2H5OH", state="l")
+    >>> comp3 = Component(name="Methanol", formula="CH3OH", state="l")
+    >>> create_mixture_id([comp1, comp2, comp3], mixture_key='Name')
+    'Ethanol|Methanol|Water'
+    """
+    try:
+        # SECTION: validate inputs
+        # NOTE: components
+        if not all(isinstance(comp, Component) for comp in components):
+            raise TypeError(
+                "All items in components must be instances of Component"
+            )
+        if len(components) == 0:
+            raise ValueError("components list cannot be empty")
+
+        # NOTE: delimiter
+        if not isinstance(delimiter, str):
+            raise TypeError("delimiter must be a string")
+        # strip delimiter
+        delimiter = delimiter.strip()
+
+        # SECTION: get component IDs
+        component_ids = []
+        for comp in components:
+            if mixture_key == 'Name':
+                comp_id = comp.name.strip().lower()
+            elif mixture_key == 'Formula':
+                comp_id = comp.formula.strip().lower()
+            elif mixture_key == 'Name-State':
+                comp_id = f"{comp.name.strip().lower()}-{comp.state.strip().lower()}"
+            elif mixture_key == 'Formula-State':
+                comp_id = f"{comp.formula.strip().lower()}-{comp.state.strip().lower()}"
+            else:
+                raise ValueError(
+                    "component_key must be either 'Name' or 'Formula'"
+                )
+            component_ids.append(comp_id)
+
+        # SECTION: create unique mixture ID (sorted to ensure uniqueness)
+        mixture_id = delimiter.join(sorted(component_ids))
+
+        # strip
+        mixture_id = mixture_id.strip()
+
+        # return
+        return mixture_id
+    except Exception as e:
+        logging.error(f"Error in create_mixture_id: {e}")
+        raise
