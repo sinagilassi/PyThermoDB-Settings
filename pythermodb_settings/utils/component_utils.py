@@ -202,7 +202,7 @@ def create_mixture_id(
     ----------
     components : list[Component]
         List of components in the mixture.
-    component_key : Literal['Name', 'Formula'], optional
+    component_key : Literal['Name', 'Formula', 'Name-State', 'Formula-State'], optional
         The key to use for identifying the components, by default 'Name'.
     delimiter : str, optional
         Delimiter to separate the components in the ID, by default "|".
