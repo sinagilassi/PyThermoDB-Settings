@@ -57,9 +57,15 @@ def create_component_id(
 def set_component_id(
     component: Component,
     component_key: Literal[
-        'Name-State', 'Formula-State'
+        'Name-State',
+        'Formula-State',
+        'Name',
+        'Formula',
+        'Name-Formula-State',
+        'Formula-Name-State'
     ],
     separator_symbol: str = '-',
+    case: Literal['lower', 'upper', None] = None
 ) -> str:
     '''
     Set component identifier based on the specified key.
@@ -73,9 +79,15 @@ def set_component_id(
         Options are:
             - 'Name-State': Use the name-state identifier.
             - 'Formula-State': Use the formula-state identifier.
+            - 'Name': Use the component name.
+            - 'Formula': Use the component formula.
+            - 'Name-Formula-State': Use the name, formula, and state.
+            - 'Formula-Name-State': Use the formula, name, and state.
     separator_symbol : str, optional
         The symbol to use as a separator between the name/formula and state.
         Default is '-'.
+    case : Literal['lower', 'upper', None], optional
+        Convert the identifier to lower or upper case.
 
     Returns
     -------
@@ -89,16 +101,43 @@ def set_component_id(
             separator_symbol=separator_symbol
         )
 
-        # set component id
+        # init component id
+        component_id: str = ""
+
+        # NOTE: set component id
         if component_key == "Name-State":
-            return component_idx.name_state
+            component_id = component_idx.name_state.strip()
         elif component_key == "Formula-State":
-            return component_idx.formula_state
+            component_id = component_idx.formula_state.strip()
+        elif component_key == "Name":
+            component_id = component.name.strip()
+        elif component_key == "Formula":
+            component_id = component.formula.strip()
+        elif component_key == "Name-Formula-State":
+            component_id = f"{component.name.strip()}{separator_symbol}{component.formula.strip()}{separator_symbol}{component.state.strip().lower()}"
+        elif component_key == "Formula-Name-State":
+            component_id = f"{component.formula.strip()}{separator_symbol}{component.name.strip()}{separator_symbol}{component.state.strip().lower()}"
         else:
             raise ValueError(
                 f"Invalid component_key '{component_key}'. "
                 f"Must be 'Name-State' or 'Formula-State'."
             )
+
+        # NOTE: apply conversion
+        if case == 'lower':
+            component_id = component_id.lower()
+        elif case == 'upper':
+            component_id = component_id.upper()
+        elif case is None:
+            pass
+        else:
+            raise ValueError(
+                f"Invalid case '{case}'. "
+                f"Must be 'lower', 'upper', or None."
+            )
+
+        # result
+        return component_id
     except Exception as e:
         logger.error(
             f"Failed to set component identifier for "
