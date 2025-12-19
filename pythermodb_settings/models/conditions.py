@@ -47,3 +47,52 @@ class Pressure(BaseModel):
         arbitrary_types_allowed=True,
         extra="allow"
     )
+
+
+class Volume(BaseModel):
+    """
+    Volume model for input validation
+
+    Attributes
+    ----------
+    value : float
+        Volume value.
+    unit : str
+        Volume unit, e.g., 'L', 'm3', 'cm3'.
+    """
+    value: float = Field(..., description="Volume value")
+    unit: str = Field(
+        ...,
+        description="Volume unit, e.g., 'L', 'm3', 'cm3'"
+    )
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="allow"
+    )
+
+
+class CustomProp(BaseModel):
+    """
+    Custom property model for input validation
+
+    Attributes
+    ----------
+    value : float | int
+        Value of the property, e.g., 'enthalpy', 'entropy'.
+    unit : str
+        Unit of the property, e.g., 'J/mol.K', 'kJ/mol'.
+    """
+    value: float | int = Field(
+        ...,
+        description="Value of the property, e.g., 'enthalpy', 'entropy'"
+    )
+    unit: str = Field(
+        ...,
+        description="Unit of the property, e.g., 'J/mol.K', 'kJ/mol'"
+    )
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="allow"
+    )
