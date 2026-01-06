@@ -1,6 +1,6 @@
 # import libs
 import logging
-from typing import Literal
+from typing import Literal, List
 from pythermodb_settings.models import Component
 # local
 from ..models import ComponentIdentity
@@ -41,10 +41,12 @@ def create_component_id(
         # SECTION: create component identifiers
         name_state = f"{component_name}{separator_symbol}{component_state}"
         formula_state = f"{component_formula}{separator_symbol}{component_state}"
+        name_formula = f"{component_name}{separator_symbol}{component_formula}"
 
         return ComponentIdentity(
             name_state=name_state,
-            formula_state=formula_state
+            formula_state=formula_state,
+            name_formula=name_formula
         )
     except Exception as e:
         logger.error(
@@ -59,6 +61,7 @@ def set_component_id(
     component_key: Literal[
         'Name-State',
         'Formula-State',
+        'Name-Formula',
         'Name',
         'Formula',
         'Name-Formula-State',
@@ -79,6 +82,7 @@ def set_component_id(
         Options are:
             - 'Name-State': Use the name-state identifier.
             - 'Formula-State': Use the formula-state identifier.
+            - 'Name-Formula': Use the name and formula.
             - 'Name': Use the component name.
             - 'Formula': Use the component formula.
             - 'Name-Formula-State': Use the name, formula, and state.
@@ -109,6 +113,8 @@ def set_component_id(
             component_id = component_idx.name_state.strip()
         elif component_key == "Formula-State":
             component_id = component_idx.formula_state.strip()
+        elif component_key == "Name-Formula":
+            component_id = component_idx.name_formula.strip()
         elif component_key == "Name":
             component_id = component.name.strip()
         elif component_key == "Formula":
@@ -235,6 +241,7 @@ def create_mixture_id(
         'Formula',
         'Name-State',
         'Formula-State',
+        'Name-Formula',
         'Name-Formula-State',
         'Formula-Name-State'
     ] = 'Name',
@@ -247,7 +254,7 @@ def create_mixture_id(
     ----------
     components : list[Component]
         List of components in the mixture.
-    component_key : Literal['Name', 'Formula', 'Name-State', 'Formula-State', 'Name-Formula-State', 'Formula-Name-State'], optional
+    component_key : Literal['Name', 'Formula', 'Name-State', 'Formula-State', 'Name-Formula', 'Name-Formula-State', 'Formula-Name-State'], optional
         The key to use for identifying the components, by default 'Name'.
     delimiter : str, optional
         Delimiter to separate the components in the ID, by default "|".
@@ -302,6 +309,8 @@ def create_mixture_id(
                 comp_id = f"{comp.name.strip()}-{comp.state.strip()}"
             elif mixture_key == 'Formula-State':
                 comp_id = f"{comp.formula.strip()}-{comp.state.strip()}"
+            elif mixture_key == 'Name-Formula':
+                comp_id = f"{comp.name.strip()}-{comp.formula.strip()}"
             elif mixture_key == 'Name-Formula-State':
                 comp_id = f"{comp.name.strip()}-{comp.formula.strip()}-{comp.state.strip()}"
             elif mixture_key == 'Formula-Name-State':
@@ -331,4 +340,62 @@ def create_mixture_id(
         return mixture_id
     except Exception as e:
         logging.error(f"Error in create_mixture_id: {e}")
+        raise
+
+
+def set_component_state(
+        component: Component,
+        state: Literal['g', 'l', 's', 'aq'],
+) -> Component:
+    """
+    Set the phase state for a single component.
+
+    Parameters
+    ----------
+    component : Component
+        A Component object.
+    state : Literal['g', 'l', 's', 'aq']
+        The desired phase state ('g' for gas, 'l' for liquid, 's' for solid, 'aq' for aqueous).
+
+    Returns
+    -------
+    Component
+        The Component object with the updated phase state.
+    """
+    try:
+        # SECTION: set component state
+        component.state = state
+        return component
+    except Exception as e:
+        logger.error(f"Error setting component state: {e}")
+        raise
+
+
+def set_components_state(
+        components: List[Component],
+        state: Literal['g', 'l', 's', 'aq'],
+) -> List[Component]:
+    """
+    Set the phase state for a list of components.
+
+    Parameters
+    ----------
+    components : List[Component]
+        A list of Component objects.
+    state : Literal['g', 'l', 's', 'aq']
+        The desired phase state ('g' for gas, 'l' for liquid, 's' for solid, 'aq' for aqueous).
+
+    Returns
+    -------
+    List[Component]
+        A list of Component objects with the updated phase states.
+    """
+    try:
+        # SECTION: set components state
+        updated_components = [
+            set_component_state(component, state) for component in components
+        ]
+        return updated_components
+    except Exception as e:
+        logger.error(f"Error setting components state: {e}")
         raise
