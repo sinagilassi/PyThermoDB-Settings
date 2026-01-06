@@ -60,3 +60,7 @@ class ComponentIdentity(BaseModel):
         ...,
         description="Component formula-state identifier"
     )
+    name_formula: str = Field(
+        ...,
+        description="Component name-formula identifier"
+    )
