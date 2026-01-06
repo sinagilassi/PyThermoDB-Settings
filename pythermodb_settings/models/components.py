@@ -8,6 +8,21 @@ from pydantic import (
     ConfigDict
 )
 
+# SECTION: Component key type
+ComponentKey = Literal[
+    'Name-State',
+    'Formula-State',
+    'Name-Formula',
+    'Name',
+    'Formula',
+    'Name-Formula-State',
+    'Formula-Name-State'
+]
+
+MixtureKey = ComponentKey
+
+# SECTION: Component model
+
 
 class Component(BaseModel):
     """
@@ -41,6 +56,7 @@ class Component(BaseModel):
     )
 
 
+# SECTION: Component identity model
 class ComponentIdentity(BaseModel):
     """
     Model for component identity.
@@ -51,6 +67,8 @@ class ComponentIdentity(BaseModel):
         Component name-state identifier.
     formula_state : str
         Component formula-state identifier.
+    name_formula : str
+        Component name-formula identifier.
     """
     name_state: str = Field(
         ...,
