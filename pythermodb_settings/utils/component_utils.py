@@ -3,7 +3,7 @@ import logging
 from typing import Literal, List
 from pythermodb_settings.models import Component
 # local
-from ..models import ComponentIdentity
+from ..models import ComponentIdentity, ComponentKey, MixtureKey
 
 # NOTE: logger
 logger = logging.getLogger(__name__)
@@ -58,15 +58,7 @@ def create_component_id(
 
 def set_component_id(
     component: Component,
-    component_key: Literal[
-        'Name-State',
-        'Formula-State',
-        'Name-Formula',
-        'Name',
-        'Formula',
-        'Name-Formula-State',
-        'Formula-Name-State'
-    ],
+    component_key: ComponentKey,
     separator_symbol: str = '-',
     case: Literal['lower', 'upper', None] = None
 ) -> str:
@@ -236,15 +228,7 @@ def create_binary_mixture_id(
 
 def create_mixture_id(
     components: list[Component],
-    mixture_key: Literal[
-        'Name',
-        'Formula',
-        'Name-State',
-        'Formula-State',
-        'Name-Formula',
-        'Name-Formula-State',
-        'Formula-Name-State'
-    ] = 'Name',
+    mixture_key: MixtureKey = "Name",
     delimiter: str = "|",
     case: Literal['lower', 'upper', None] = None
 ) -> str:
