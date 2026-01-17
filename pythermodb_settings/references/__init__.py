@@ -1,5 +1,6 @@
-from .main import extract_reference_components
+from .main import extract_reference_components, check_reference_component_availability
 
 __all__ = [
-    "extract_reference_components"
+    "extract_reference_components",
+    "check_reference_component_availability",
 ]
