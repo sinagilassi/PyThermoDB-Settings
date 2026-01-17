@@ -182,6 +182,86 @@ class ComponentExtractor:
         }
 
     @measure_time
+    def check_component_availability(
+        self,
+        reference: Union[str, Path, Dict[str, Any]],
+        *,
+        component_keys: Optional[List[str]] = None,
+        components: Optional[List[Component]] = None,
+        component_key: ComponentKey = "Name",
+        separator_symbol: str = "-",
+        case: Literal['lower', 'upper', None] = None,
+        renumber: bool = False,
+        **kwargs
+    ) -> Dict[str, Any]:
+        """
+        Check whether requested components exist in a reference and return a summary.
+
+        Args:
+            reference: YAML text, path to a YAML file, or already-parsed reference dict.
+            component_keys/components/component_key/etc: Same semantics as filter_components.
+            renumber: Passed through to _filter_reference_dict when building matches (defaults to False to avoid rewriting IDs).
+
+        Returns:
+            Dict with matched, missing, normalized requested keys, and a human-readable summary string.
+        """
+        key_inputs = self._collect_keys(
+            component_keys=component_keys,
+            components=components,
+            component_key=component_key,
+            separator_symbol=separator_symbol,
+            case=case
+        )
+
+        # Load reference data from dict, YAML text, or file path.
+        if isinstance(reference, dict):
+            reference_dict = deepcopy(reference)
+        else:
+            if isinstance(reference, Path):
+                text = reference.read_text(encoding="utf-8")
+            else:
+                ref_path = Path(reference)
+                text = ref_path.read_text(
+                    encoding="utf-8") if ref_path.exists() else str(reference)
+
+            sections = self.extractor.extract_yaml_sections(text)
+            if not sections:
+                raise ValueError(
+                    "No YAML sections were found in the provided text.")
+
+            reference_dict = self._pick_reference_section(sections)
+            if reference_dict is None:
+                raise ValueError(
+                    "No YAML section with a 'REFERENCES' root was found.")
+
+        _, found = self._filter_reference_dict(
+            reference_dict,
+            key_inputs,
+            component_key,
+            separator_symbol=separator_symbol,
+            case_mode=case,
+            renumber=renumber
+        )
+
+        requested = {
+            self._normalize_key(cid, separator_symbol, case) for cid in key_inputs
+        }
+        missing = requested - found
+
+        summary_parts = [f"Found {len(found)}/{len(requested)} component(s)."]
+        if missing:
+            summary_parts.append(f"Missing: {', '.join(sorted(missing))}.")
+        else:
+            summary_parts.append("All requested components are present.")
+
+        return {
+            "matched": sorted(found),
+            "missing": sorted(missing),
+            "requested": sorted(requested),
+            "summary": " ".join(summary_parts)
+        }
+
+    @measure_time
     def filter_components_from_data(
         self,
         reference_data: Optional[Union[Dict[str, Any], str]] = None,
