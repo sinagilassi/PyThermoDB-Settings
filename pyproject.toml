@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pythermodb-settings"
-version = "0.2.0"
-description = "Configuration management for PyThermoDB using Pydantic"
+version = "0.2.1"
+description = "PyThermoDB Settings is a Python package that acts as an interface between PyThermDB and other applications, providing robust, Pydantic-based data models and configuration structures for managing thermodynamic database (ThermoDB) settings."
 authors = [
     { name = "Sina Gilassi", email = "sina.gilassi@gmail.com" }
 ]
