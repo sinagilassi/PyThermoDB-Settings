@@ -71,3 +71,60 @@ def extract_reference_components(
     except Exception as e:
         logger.error(f"Error in building reference components: {e}")
         raise
+
+
+@measure_time
+def check_reference_component_availability(
+    reference: str | Path | Dict[str, Any],
+    *,
+    component_keys: Optional[List[str]] = None,
+    components: Optional[List[Component]] = None,
+    component_key: ComponentKey = "Name",
+    separator_symbol: str = "-",
+    case: Literal['lower', 'upper'] | None = None,
+    renumber: bool = False,
+    **kwargs
+) -> Dict[str, Any]:
+    """
+    Check whether requested components exist in a reference and return a summary.
+
+    Parameters
+    ----------
+    reference : Union[str, Path, Dict[str, Any]]
+        Reference file path or reference data dictionary.
+    component_keys : List[str], optional
+        List of component keys to check in the reference such as 'H2O', 'CO2'.
+    components : List[Component]
+        List of Component to check in the reference such as name, formula.
+    component_key : ComponentKey, optional
+        Key type to identify components. Default is "Name".
+    separator_symbol : str, optional
+        Symbol used to separate fields in the component key. Default is "-".
+    case : Literal['lower', 'upper', None], optional
+        Case transformation for component keys. Default is None.
+    renumber : bool, optional
+        Whether to renumber component IDs. Default is False.
+    **kwargs
+        Additional keyword arguments.
+
+    Returns:
+        Dict[str, any]: Dictionary containing matched components and missing components.
+    """
+    try:
+        # NOTE: extractor instance
+        ce = ComponentExtractor()
+
+        # check component availability
+        result = ce.check_component_availability(
+            reference,
+            component_keys=component_keys,
+            components=components,
+            component_key=component_key,
+            separator_symbol=separator_symbol,
+            case=case,
+            renumber=renumber,
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Error in checking component availability: {e}")
+        raise
