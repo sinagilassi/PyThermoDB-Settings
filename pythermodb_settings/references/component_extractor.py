@@ -19,8 +19,15 @@ except ImportError:  # pragma: no cover - fallback when libyaml not present
 logger = logging.getLogger(__name__)
 
 # NOTE: custom sequence type to force block-style YAML for certain lists
+
+
 class BlockSeq(list):
     """Marker list that should be emitted in block style (dash-prefixed lines)."""
+    pass
+
+# NOTE: helper type to force double-quoted scalars
+class QuotedString(str):
+    """Scalar that will be emitted with double quotes."""
     pass
 
 
@@ -210,7 +217,8 @@ class ComponentExtractor:
             renumber: Passed through to _filter_reference_dict when building matches (defaults to False to avoid rewriting IDs).
 
         Returns:
-            Dict with matched, missing, normalized requested keys, and a human-readable summary string.
+            Dict with matched keys, missing keys, normalized requested keys,
+            matched_components (as Component objects), and a human-readable summary string.
         """
         key_inputs = self._collect_keys(
             component_keys=component_keys,
@@ -241,13 +249,26 @@ class ComponentExtractor:
                 raise ValueError(
                     "No YAML section with a 'REFERENCES' root was found.")
 
-        _, found = self._filter_reference_dict(
+        filtered_reference, found = self._filter_reference_dict(
             reference_dict,
             key_inputs,
             component_key,
             separator_symbol=separator_symbol,
             case_mode=case,
             renumber=renumber
+        )
+
+        normalized_requested = [
+            self._normalize_key(cid, separator_symbol, case) for cid in key_inputs
+        ]
+
+        matched_components = self._collect_components_by_key(
+            reference_dict,
+            matched_keys=found,
+            requested_keys=normalized_requested,
+            component_key=component_key,
+            separator_symbol=separator_symbol,
+            case_mode=case
         )
 
         requested = {
@@ -265,6 +286,7 @@ class ComponentExtractor:
             "matched": sorted(found),
             "missing": sorted(missing),
             "requested": sorted(requested),
+            "matched_components": matched_components,
             "summary": " ".join(summary_parts)
         }
 
@@ -420,6 +442,94 @@ class ComponentExtractor:
 
         return filtered, found
 
+    def _collect_components_by_key(
+        self,
+        reference: Dict[str, Any],
+        *,
+        matched_keys: Set[str],
+        requested_keys: List[str],
+        component_key: ComponentKey,
+        separator_symbol: str,
+        case_mode: Literal['lower', 'upper', None]
+    ) -> List[Component]:
+        """Build Component objects for rows matching the requested keys."""
+        components_by_key: Dict[str, Component] = {}
+
+        references = reference.get("REFERENCES", {}) or {}
+        for ref_body in references.values():
+            tables = ref_body.get("TABLES", {}) or {}
+            for table in tables.values():
+                structure = table.get("STRUCTURE", {}) or {}
+                columns = structure.get("COLUMNS") or []
+                values = table.get("VALUES") or []
+
+                if not values or not isinstance(values, list):
+                    continue
+
+                column_lookup = {str(col).lower(): idx for idx,
+                                 col in enumerate(columns)}
+
+                for row in values:
+                    key = self._build_component_key(
+                        row,
+                        columns,
+                        component_key,
+                        separator_symbol,
+                        case_mode
+                    )
+                    if not key or key not in matched_keys or key in components_by_key:
+                        continue
+
+                    component = self._row_to_component(row, column_lookup)
+                    if component:
+                        components_by_key[key] = component
+
+        ordered_components: List[Component] = []
+        for req_key in requested_keys:
+            comp = components_by_key.get(req_key)
+            if comp:
+                ordered_components.append(comp)
+
+        return ordered_components
+
+    def _row_to_component(
+        self,
+        row: Any,
+        column_lookup: Dict[str, int]
+    ) -> Optional[Component]:
+        """Convert a VALUES row into a Component instance."""
+        name = self._get_column_value(row, column_lookup.get("name"))
+        formula = self._get_column_value(row, column_lookup.get("formula"))
+        state = self._get_column_value(row, column_lookup.get("state"))
+
+        if not (name and formula and state):
+            logger.debug(
+                "Skipping row because required component fields are missing: %s",
+                row
+            )
+            return None
+
+        try:
+            allowed_states = {'g', 'l', 's', 'aq'}
+            state_value = str(state).strip().lower()
+            if state_value not in allowed_states:
+                logger.debug(
+                    "Skipping row because state '%s' is not one of %s: %s",
+                    state_value, allowed_states, row
+                )
+                return None
+            return Component(
+                name=str(name).strip(),
+                formula=str(formula).strip(),
+                state=state_value  # type: ignore
+            )
+        except Exception as exc:
+            logger.debug(
+                "Failed to build Component from row %s: %s",
+                row, exc
+            )
+            return None
+
     def _build_component_key(
         self,
         row: Any,
@@ -570,11 +680,18 @@ class ComponentExtractor:
 
         FlowSeqDumper.add_representer(list, _represent_list)
         FlowSeqDumper.add_representer(BlockSeq, _represent_list)
+        FlowSeqDumper.add_representer(
+            QuotedString,
+            lambda dumper, data: dumper.represent_scalar(
+                "tag:yaml.org,2002:str", str(data), style='"'
+            )
+        )
         return FlowSeqDumper
 
     def _format_for_dump(self, reference: Dict[str, Any]) -> Dict[str, Any]:
         """Apply formatting hints (e.g., block lists) before YAML dumping."""
         self._apply_block_style_to_equations(reference)
+        self._quote_component_fields(reference)
         return reference
 
     def _apply_block_style_to_equations(self, reference: Dict[str, Any]) -> None:
@@ -591,3 +708,23 @@ class ComponentExtractor:
                         seq = equation.get(key)
                         if isinstance(seq, list) and not isinstance(seq, BlockSeq):
                             equation[key] = BlockSeq(seq)
+
+    def _quote_component_fields(self, reference: Dict[str, Any]) -> None:
+        """
+        Force the first four component fields (Name, Formula, State, Formula-Raw)
+        to be emitted with quotes to preserve spacing and capitalization.
+        """
+        references = reference.get("REFERENCES", {}) or {}
+        for ref_body in references.values():
+            tables = ref_body.get("TABLES", {}) or {}
+            for table in tables.values():
+                values = table.get("VALUES")
+                if not values or not isinstance(values, list):
+                    continue
+
+                for row in values:
+                    if not isinstance(row, list):
+                        continue
+                    for idx in range(min(4, len(row))):
+                        if isinstance(row[idx], str):
+                            row[idx] = QuotedString(row[idx])
