@@ -18,6 +18,11 @@ except ImportError:  # pragma: no cover - fallback when libyaml not present
 # NOTE: logger
 logger = logging.getLogger(__name__)
 
+# NOTE: custom sequence type to force block-style YAML for certain lists
+class BlockSeq(list):
+    """Marker list that should be emitted in block style (dash-prefixed lines)."""
+    pass
+
 
 class ComponentExtractor:
     """
@@ -151,8 +156,10 @@ class ComponentExtractor:
             renumber=renumber
         )
 
+        formatted = self._format_for_dump(filtered)
+
         yaml_str = yaml.dump(
-            filtered,
+            formatted,
             Dumper=self._yaml_dumper,
             sort_keys=False,
             default_flow_style=False,
@@ -314,8 +321,10 @@ class ComponentExtractor:
             renumber=renumber
         )
 
+        formatted = self._format_for_dump(filtered)
+
         yaml_str = yaml.dump(
-            filtered,
+            formatted,
             Dumper=self._yaml_dumper,
             sort_keys=False,
             default_flow_style=False,
@@ -548,14 +557,37 @@ class ComponentExtractor:
             FlowSeqDumper = type("FlowSeqDumper", (yaml.SafeDumper,), {})
 
         def _represent_list(dumper, data):
+            force_block = isinstance(data, BlockSeq) or getattr(
+                data, "_yaml_block_style", False)
             is_scalar_seq = all(
                 not isinstance(item, (list, dict)) for item in data
             )
             return dumper.represent_sequence(
                 "tag:yaml.org,2002:seq",
                 data,
-                flow_style=is_scalar_seq
+                flow_style=False if force_block else is_scalar_seq
             )
 
         FlowSeqDumper.add_representer(list, _represent_list)
+        FlowSeqDumper.add_representer(BlockSeq, _represent_list)
         return FlowSeqDumper
+
+    def _format_for_dump(self, reference: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply formatting hints (e.g., block lists) before YAML dumping."""
+        self._apply_block_style_to_equations(reference)
+        return reference
+
+    def _apply_block_style_to_equations(self, reference: Dict[str, Any]) -> None:
+        """Force equation BODY fields to use block-style YAML output."""
+        references = reference.get("REFERENCES", {}) or {}
+        for ref_body in references.values():
+            tables = ref_body.get("TABLES", {}) or {}
+            for table in tables.values():
+                equations = table.get("EQUATIONS", {}) or {}
+                for equation in equations.values():
+                    if not isinstance(equation, dict):
+                        continue
+                    for key in ("BODY", "BODY-INTEGRAL", "BODY-FIRST-DERIVATIVE", "BODY-SECOND-DERIVATIVE"):
+                        seq = equation.get(key)
+                        if isinstance(seq, list) and not isinstance(seq, BlockSeq):
+                            equation[key] = BlockSeq(seq)
