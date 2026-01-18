@@ -108,7 +108,8 @@ def check_reference_component_availability(
         Additional keyword arguments.
 
     Returns:
-        Dict[str, any]: Dictionary containing matched components and missing components.
+        Dict[str, any]: Dictionary containing matched components, missing components,
+        and matched_components as Component objects built from the reference.
     """
     try:
         # NOTE: extractor instance
