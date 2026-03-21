@@ -1,6 +1,6 @@
 # import libs
 from pythermodb_settings import __version__
-from pythermodb_settings.models import Component
+from pythermodb_settings.models import Component,
 from pythermodb_settings.utils import set_component_id
 from rich import print
 

@@ -1,6 +1,6 @@
 # export
 from .components import Component, ComponentIdentity, ComponentKey, MixtureKey
-from .conditions import Temperature, Pressure, Volume, CustomProp
+from .conditions import Temperature, Pressure, Volume, CustomProp, CustomProperty
 from .configs import ComponentConfig
 from .references import (
     ReferenceThermoDB,
@@ -21,6 +21,7 @@ __all__ = [
     "Pressure",
     "Volume",
     "CustomProp",
+    "CustomProperty",
     "ComponentConfig",
     "ReferenceThermoDB",
     "ComponentReferenceThermoDB",

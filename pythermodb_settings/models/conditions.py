@@ -96,3 +96,45 @@ class CustomProp(BaseModel):
         arbitrary_types_allowed=True,
         extra="allow"
     )
+
+
+class CustomProperty(BaseModel):
+    """
+    Custom property model for input validation
+
+    Attributes
+    ----------
+    name : str | None
+        Name of the property, e.g., 'enthalpy', 'entropy'.
+    value : float | int
+        Value of the property, e.g., 'enthalpy', 'entropy'.
+    unit : str
+        Unit of the property, e.g., 'J/mol.K', 'kJ/mol'.
+    symbol : str
+        Symbol of the property, e.g., 'H' for enthalpy, 'S' for entropy.
+    """
+    name: str | None = Field(
+        default=None,
+        description="Name of the property, e.g., 'enthalpy', 'entropy'"
+    )
+    description: str | None = Field(
+        default=None,
+        description="Description of the property, e.g., 'Enthalpy of formation at 298 K'"
+    )
+    value: float | int = Field(
+        ...,
+        description="Value of the property, e.g., 'enthalpy', 'entropy'"
+    )
+    unit: str = Field(
+        ...,
+        description="Unit of the property, e.g., 'J/mol.K', 'kJ/mol'"
+    )
+    symbol: str = Field(
+        ...,
+        description="Symbol of the property, e.g., 'H' for enthalpy, 'S' for entropy"
+    )
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="allow"
+    )
