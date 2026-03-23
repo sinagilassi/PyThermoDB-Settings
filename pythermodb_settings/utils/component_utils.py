@@ -69,7 +69,7 @@ def set_component_id(
     ----------
     component : Component
         The component for which to set the identifier.
-    component_key : str
+    component_key : ComponentKey
         The key to determine which identifier to use.
         Options are:
             - 'Name-State': Use the name-state identifier.
