@@ -13,6 +13,11 @@ from .tools import (
     measure_time,
 )
 
+# opt tools
+from .opt_tools import (
+    set_feed_specification,
+)
+
 #
 __all__ = [
     "create_component_id",
@@ -22,4 +27,5 @@ __all__ = [
     "set_component_state",
     "set_components_state",
     "measure_time",
+    "set_feed_specification",
 ]
