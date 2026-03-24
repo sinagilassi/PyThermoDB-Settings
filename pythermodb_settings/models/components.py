@@ -7,6 +7,7 @@ from pydantic import (
     Field,
     ConfigDict
 )
+# locals
 
 # SECTION: Component key type
 ComponentKey = Literal[
@@ -46,8 +47,13 @@ class Component(BaseModel):
         description="State of the component: 'g' for gas, 'l' for liquid, 's' for solid, 'aq' for aqueous"
     )
     mole_fraction: float = Field(
-        default=1.0,
+        default=0,
         description="Mole fraction of the component in a mixture, if applicable"
+    )
+
+    X: dict = Field(
+        default_factory=dict,
+        description="Custom properties for the component must include 'name', 'value', 'unit', 'symbol"
     )
 
     model_config = ConfigDict(
