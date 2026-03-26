@@ -1,6 +1,6 @@
 # import libs
 import logging
-from typing import Literal, List
+from typing import Literal, List, Optional
 from pythermodb_settings.models import Component
 # local
 from ..models import ComponentIdentity, ComponentKey, MixtureKey
@@ -383,3 +383,90 @@ def set_components_state(
     except Exception as e:
         logger.error(f"Error setting components state: {e}")
         raise
+
+
+# SECTION: map component key
+def build_component_mapper(
+        component: Component,
+        component_keys: Optional[List[ComponentKey]] = None
+):
+    '''
+    Build component mapper based on the specified component keys.
+
+    Parameters
+    ----------
+    component : Component
+        The component for which to build the mapper.
+    component_keys : Optional[List[ComponentKey]], optional
+        The list of component keys to include in the mapper. If None, all keys will be included.
+
+    Returns
+    -------
+    Dict[str, str]
+        A dictionary where the keys are the specified component keys and the values are the corresponding component identifiers.
+    '''
+    # NOTE: check if component_keys is None, if so include all keys
+    if component_keys is None:
+        component_keys = [
+            'Name-State', 'Formula-State', 'Name-Formula', 'Name-Formula-State', 'Formula-Name-State'
+        ]
+
+    # NOTE: build mapper
+    mapper = {}
+
+    for key in component_keys:
+        mapper[key] = set_component_id(
+            component=component,
+            component_key=key
+        )
+
+    return mapper
+
+
+def build_components_mapper(
+        components: List[Component],
+        component_key: ComponentKey,
+        component_keys: Optional[List[ComponentKey]] = None
+):
+    '''
+    Build a list of component mappers for a list of components based on the specified component keys.
+
+    Parameters
+    ----------
+    components : List[Component]
+        The list of components for which to build the mappers.
+    component_key : ComponentKey
+        The key to determine which identifier to use for the mapper.
+    component_keys : Optional[List[ComponentKey]], optional
+        The list of component keys to include in the mappers. If None, all keys will be included.
+
+    Returns
+    -------
+    List[Dict[str, str]]
+        A list of dictionaries, where each dictionary is a mapper for a component based on the specified keys.
+    '''
+    # NOTE: check if component_keys is None, if so include all keys
+    if component_keys is None:
+        component_keys = [
+            'Name-State', 'Formula-State', 'Name-Formula', 'Name-Formula-State', 'Formula-Name-State'
+        ]
+
+    # NOTE: build mappers for each component
+    mappers = {}
+
+    # create key
+    mapper_keys = [
+        set_component_id(
+            component=component,
+            component_key=component_key
+        ) for component in components
+    ]
+
+    # NOTE: build mappers
+    for key, component in zip(mapper_keys, components):
+        mappers[key] = build_component_mapper(
+            component=component,
+            component_keys=component_keys
+        )
+
+    return mappers
