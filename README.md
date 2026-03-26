@@ -5,10 +5,13 @@
 ![PyPI Version](https://img.shields.io/pypi/v/pythermodb-settings)
 ![Supported Python Versions](https://img.shields.io/pypi/pyversions/pythermodb-settings.svg)
 ![License](https://img.shields.io/pypi/l/pythermodb-settings)
+[![Download on the App Store](https://img.shields.io/badge/Download_on_the_App_Store-0D0D0D?logo=apple&logoColor=white)](https://apps.apple.com/ca/app/mozithermocalc/id6759209992)
 
 ## 📖 Introduction
 
 **PyThermoDB Settings** is a Python package that acts as an interface between [pythermdb](https://github.com/sinagilassi/pythermdb) and other applications, providing robust, Pydantic-based data models and configuration structures for managing thermodynamic database (ThermoDB) settings.
+
+Calculations can also be done on your mobile with the MoziThermoCalc iOS app: [Download on the App Store](https://apps.apple.com/ca/app/mozithermocalc/id6759209992).
 
 ## ✨ Features
 
