@@ -1,6 +1,6 @@
 # import libs
 from pythermodb_settings.models import Component
-from pythermodb_settings.utils import build_component_mapper, build_components_mapper
+from pythermodb_settings.utils import build_component_mapper, build_components_mapper, is_component_key
 from rich import print
 
 # NOTE: create a component
@@ -21,3 +21,22 @@ components_mapper = build_components_mapper(
     'Formula-State'
 )
 print(components_mapper)
+
+# SECTION: type guard
+component_keys = [
+    'Name',
+    'Formula  ',
+    'State',
+    'InvalidKey   ',
+    'Name-State',
+    'Formula-State    ',
+    'State-Name',
+    'Name-Formula-State',
+    'InvalidKey-Name',
+    'Name-InvalidKey',
+]
+print(is_component_key('Name'))  # True
+print(is_component_key('InvalidKey'))  # False
+
+for key in component_keys:
+    print(f"{key}: {is_component_key(key)}")

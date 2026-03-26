@@ -1,6 +1,6 @@
 # import libs
 import logging
-from typing import Literal, List, Optional, Dict
+from typing import Literal, List, Optional, Dict, TypeGuard, cast, get_args
 from pythermodb_settings.models import Component
 # local
 from ..models import ComponentIdentity, ComponentKey, MixtureKey
@@ -470,3 +470,11 @@ def build_components_mapper(
         )
 
     return mappers
+
+
+# SECTION: type guards
+_VALID_COMPONENT_KEYS = cast(tuple[str, ...], get_args(ComponentKey))
+
+
+def is_component_key(value: str) -> TypeGuard[ComponentKey]:
+    return value.strip() in _VALID_COMPONENT_KEYS
