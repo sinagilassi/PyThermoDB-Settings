@@ -1,6 +1,6 @@
 # import libs
 import logging
-from typing import Literal, List, Optional
+from typing import Literal, List, Optional, Dict
 from pythermodb_settings.models import Component
 # local
 from ..models import ComponentIdentity, ComponentKey, MixtureKey
@@ -389,7 +389,7 @@ def set_components_state(
 def build_component_mapper(
         component: Component,
         component_keys: Optional[List[ComponentKey]] = None
-):
+) -> Dict[ComponentKey, str]:
     '''
     Build component mapper based on the specified component keys.
 
@@ -402,7 +402,7 @@ def build_component_mapper(
 
     Returns
     -------
-    Dict[str, str]
+    Dict[ComponentKey, str]
         A dictionary where the keys are the specified component keys and the values are the corresponding component identifiers.
     '''
     # NOTE: check if component_keys is None, if so include all keys
@@ -427,7 +427,7 @@ def build_components_mapper(
         components: List[Component],
         component_key: ComponentKey,
         component_keys: Optional[List[ComponentKey]] = None
-):
+) -> Dict[str, Dict[ComponentKey, str]]:
     '''
     Build a list of component mappers for a list of components based on the specified component keys.
 
@@ -442,7 +442,7 @@ def build_components_mapper(
 
     Returns
     -------
-    List[Dict[str, str]]
+    Dict[str, Dict[ComponentKey, str]]
         A list of dictionaries, where each dictionary is a mapper for a component based on the specified keys.
     '''
     # NOTE: check if component_keys is None, if so include all keys
