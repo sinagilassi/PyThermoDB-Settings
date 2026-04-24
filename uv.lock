@@ -106,7 +106,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "pydantic", specifier = ">=2.11.7" },
+    { name = "pydantic" },
     { name = "pyyaml", specifier = ">=6.0.2" },
 ]
 
