@@ -9,6 +9,7 @@ from .component_utils import (
     build_component_mapper,
     build_components_mapper,
     is_component_key,
+    generate_component_references
 )
 
 # tools
@@ -34,4 +35,5 @@ __all__ = [
     "build_component_mapper",
     "build_components_mapper",
     "is_component_key",
+    "generate_component_references"
 ]
