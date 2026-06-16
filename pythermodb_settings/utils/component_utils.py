@@ -1,6 +1,6 @@
 # import libs
 import logging
-from typing import Literal, List, Optional, Dict, TypeGuard, cast, get_args
+from typing import Literal, List, Optional, Dict, TypeGuard, cast, get_args, Any
 from pythermodb_settings.models import Component
 # local
 from ..models import ComponentIdentity, ComponentKey, MixtureKey
@@ -478,3 +478,95 @@ _VALID_COMPONENT_KEYS = cast(tuple[str, ...], get_args(ComponentKey))
 
 def is_component_key(value: str) -> TypeGuard[ComponentKey]:
     return value.strip() in _VALID_COMPONENT_KEYS
+
+
+# SECTION: Component references
+def generate_component_references(
+        components: List[Component],
+        component_key: ComponentKey
+) -> Dict[str, Any]:
+    """
+    Generate component references based on the components and the component key. This method creates a mapping of component IDs, formula-state representations, and other relevant references for the components in the model source.
+
+    Returns
+    -------
+    Dict[str, Any]
+        A dictionary containing the generated component references, including:
+        - component_num: The number of components.
+        - component_ids: A list of component IDs generated based on the component key.
+        - component_mapper: A dictionary mapping component IDs to their corresponding component keys for different properties.
+        - component_id_to_index: A dictionary mapping component IDs to their corresponding indices in the components list.
+        - component_name_state: A list of name-state representations for the components.
+        - component_formula_state: A list of formula-state representations for the components.
+        - component_name_formula: A list of name-formula representations for the components.
+        - component_name_formula_state: A list of name-formula-state representations for the components.
+    """
+    # NOTE: numbers
+    component_num = len(components)
+
+    # NOTE: Create component ID list
+    component_ids: list[str] = [
+        set_component_id(
+            component=comp,
+            component_key=cast(ComponentKey, component_key)
+        )
+        for comp in components
+    ]
+
+    # >>> formula-state
+    component_formula_state: list[str] = [
+        set_component_id(
+            component=component,
+            component_key='Formula-State'
+        )
+        for component in components
+    ]
+
+    # >>> name-state
+    component_name_state: list[str] = [
+        set_component_id(
+            component=component,
+            component_key='Name-State'
+        )
+        for component in components
+    ]
+
+    # >>> name-formula
+    component_name_formula: list[str] = [
+        set_component_id(
+            component=component,
+            component_key='Name-Formula'
+        )
+        for component in components
+    ]
+
+    # >>> name-formula-state
+    component_name_formula_state: list[str] = [
+        set_component_id(
+            component=component,
+            component_key='Name-Formula-State'
+        )
+        for component in components
+    ]
+
+    # NOTE: build component mapper
+    component_mapper: Dict[str, Dict[ComponentKey, str]] = build_components_mapper(
+        components=components,
+        component_key=cast(ComponentKey, component_key)
+    )
+
+    # >> index mapping
+    component_id_to_index: dict[str, int] = {
+        comp_id: idx for idx, comp_id in enumerate(component_ids)
+    }
+
+    return {
+        "component_num": component_num,
+        "component_ids": component_ids,
+        "component_mapper": component_mapper,
+        "component_id_to_index": component_id_to_index,
+        "component_name_state": component_name_state,
+        "component_formula_state": component_formula_state,
+        "component_name_formula": component_name_formula,
+        "component_name_formula_state": component_name_formula_state
+    }
