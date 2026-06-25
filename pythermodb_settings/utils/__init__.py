@@ -9,7 +9,9 @@ from .component_utils import (
     build_component_mapper,
     build_components_mapper,
     is_component_key,
-    generate_component_references
+    generate_component_references,
+    find_component_by_id,
+    find_components_by_ids,
 )
 
 # tools
@@ -22,7 +24,7 @@ from .opt_tools import (
     set_feed_specification,
 )
 
-#
+# all
 __all__ = [
     "create_component_id",
     "set_component_id",
@@ -35,5 +37,7 @@ __all__ = [
     "build_component_mapper",
     "build_components_mapper",
     "is_component_key",
-    "generate_component_references"
+    "generate_component_references",
+    "find_component_by_id",
+    "find_components_by_ids",
 ]
