@@ -11,6 +11,7 @@ from .references import (
 )
 from .rules import ComponentRule
 from .source import ComponentThermoDBSource, MixtureThermoDBSource
+from .constants import CustomConstant
 
 __all__ = [
     "Component",
@@ -30,5 +31,6 @@ __all__ = [
     "MixtureReferenceThermoDB",
     "ComponentRule",
     "ComponentThermoDBSource",
-    "MixtureThermoDBSource"
+    "MixtureThermoDBSource",
+    "CustomConstant"
 ]
