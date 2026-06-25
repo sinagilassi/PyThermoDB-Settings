@@ -570,3 +570,100 @@ def generate_component_references(
         "component_name_formula": component_name_formula,
         "component_name_formula_state": component_name_formula_state
     }
+
+# SECTION: find component by identifier
+
+
+def find_component_by_id(
+        id: str,
+        components: List[Component],
+        case_sensitive: bool = True
+) -> Optional[Component]:
+    """
+    Find a component in the list of components by its identifier.
+
+    Parameters
+    ----------
+    id : str
+        The identifier of the component to find.
+    components : List[Component]
+        The list of components to search.
+    case_sensitive : bool, optional
+        Whether the search should be case-sensitive. Default is True.
+
+    Returns
+    -------
+    Optional[Component]
+        The component with the matching identifier, or None if not found.
+    """
+    # NOTE: normalize input identifier before comparing it with generated IDs.
+    component_id = id.strip()
+
+    # NOTE: check if case_sensitive is False, if so convert id to lower case
+    if not case_sensitive:
+        case = 'lower'
+        component_id = component_id.lower()
+    else:
+        case = None
+
+    # NOTE: iterate through components and check if the id matches any of the component's identifiers
+    for component in components:
+        # ! check if the id matches any of the component's identifiers
+        if (
+            set_component_id(component, 'Name-State', case=case) == component_id or
+            set_component_id(component, 'Formula-State', case=case) == component_id or
+            set_component_id(component, 'Name-Formula', case=case) == component_id or
+            set_component_id(component, 'Name-Formula-State', case=case) == component_id or
+            set_component_id(component, 'Formula-Name-State', case=case) == component_id
+        ):
+            return component
+
+        # ! for 'Name' and 'Formula' keys, check if the id matches the component's name or formula directly
+        if (
+            set_component_id(component, 'Name', case=case) == component_id or
+            set_component_id(component, 'Formula', case=case) == component_id
+        ):
+            return component
+    return None
+
+
+def find_components_by_ids(
+        ids: List[str],
+        components: List[Component],
+        case_sensitive: bool = True
+) -> Optional[List[Component]]:
+    """
+    Find multiple components in the list of components by their identifiers.
+
+    Parameters
+    ----------
+    ids : List[str]
+        The list of identifiers of the components to find.
+    components : List[Component]
+        The list of components to search.
+    case_sensitive : bool, optional
+        Whether the search should be case-sensitive. Default is True.
+
+    Returns
+    -------
+    List[Optional[Component]]
+        A list of components with the matching identifiers, or None.
+    """
+    try:
+        res: List[Optional[Component]] = [
+            find_component_by_id(
+                id=id,
+                components=components,
+                case_sensitive=case_sensitive
+            )
+            for id in ids
+        ]
+
+        # NOTE: any of the results is None, return None
+        if any(r is None for r in res):
+            return None
+
+        return [r for r in res if r is not None]
+    except Exception as e:
+        logger.error(f"Error in find_components_by_ids: {e}")
+        raise
