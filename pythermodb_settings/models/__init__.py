@@ -1,5 +1,12 @@
 # export
-from .components import Component, ComponentIdentity, ComponentKey, MixtureKey
+from .components import (
+    Component,
+    ComponentIdentity,
+    Mixture,
+    MixtureIdentity,
+    ComponentKey,
+    MixtureKey
+)
 from .conditions import Temperature, Pressure, Volume, CustomProp, CustomProperty
 from .configs import ComponentConfig
 from .references import (
@@ -16,6 +23,8 @@ from .constants import CustomConstant
 __all__ = [
     "Component",
     "ComponentIdentity",
+    "Mixture",
+    "MixtureIdentity",
     "ComponentKey",
     "MixtureKey",
     "Temperature",
