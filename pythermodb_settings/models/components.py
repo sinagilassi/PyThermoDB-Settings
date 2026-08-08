@@ -1,6 +1,7 @@
 # import libs
 from typing import (
-    Literal
+    Literal,
+    TypeAlias
 )
 from pydantic import (
     BaseModel,
@@ -87,4 +88,37 @@ class ComponentIdentity(BaseModel):
     name_formula: str = Field(
         ...,
         description="Component name-formula identifier"
+    )
+
+
+# SECTION: Mixture model
+Mixture: TypeAlias = list[Component]
+
+# SECTION: Mixture identity model
+
+
+class MixtureIdentity(BaseModel):
+    """
+    Model for mixture identity.
+
+    Attributes
+    ----------
+    name_state : str
+        Mixture name-state identifier, e.g., "water-l|ethanol-l".
+    formula_state : str
+        Mixture formula-state identifier, e.g., "H2O-l|C2H6O-l".
+    name_formula : str
+        Mixture name-formula identifier, e.g., "water-H2O|ethanol-C2H6O".
+    """
+    name_state: str = Field(
+        ...,
+        description="Mixture name-state identifier"
+    )
+    formula_state: str = Field(
+        ...,
+        description="Mixture formula-state identifier"
+    )
+    name_formula: str = Field(
+        ...,
+        description="Mixture name-formula identifier"
     )
