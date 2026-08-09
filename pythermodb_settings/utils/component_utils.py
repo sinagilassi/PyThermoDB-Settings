@@ -613,7 +613,16 @@ def generate_mixture_references(
     Notes
     -----
     - The mixture ID is created by concatenating the component identifiers of each mixture, sorted alphabetically, and separated by the specified delimiter.
+    - Validation is performed to ensure that the mixtures list is not empty. If it is empty, an empty dictionary with mixture_num set to 0 and an empty mixture_id list is returned.
+    - If mixture_keys is None, a default list of keys is used: ['Name', 'Formula', 'Name-State', 'Formula-State', 'Name-Formula'].
     """
+    # NOTE: validation
+    if len(mixtures) == 0:
+        return {
+            "mixture_num": 0,
+            "mixture_id": [],
+        }
+
     # NOTE: create mixture id
     mixture_ids = [
         create_mixture_id(
