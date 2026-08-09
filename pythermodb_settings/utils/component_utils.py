@@ -1,9 +1,15 @@
 # import libs
 import logging
 from typing import Literal, List, Optional, Dict, TypeGuard, cast, get_args, Any
-from pythermodb_settings.models import Component
 # local
-from ..models import ComponentIdentity, ComponentKey, MixtureKey
+from ..models import (
+    Component,
+    ComponentIdentity,
+    ComponentKey,
+    Mixture,
+    MixtureIdentity,
+    MixtureKey
+)
 
 # NOTE: logger
 logger = logging.getLogger(__name__)
@@ -571,6 +577,88 @@ def generate_component_references(
         "component_name_formula_state": component_name_formula_state
     }
 
+
+# SECTION: mixture references
+def generate_mixture_references(
+        mixtures: List[Mixture],
+        mixture_key: MixtureKey,
+        mixture_keys: Optional[List[MixtureKey]] = None,
+        delimiter: str = "|",
+        case: Literal['lower', 'upper'] | None = None
+) -> Dict[str, Any]:
+    """
+    Generate mixture references based on the mixtures and the mixture key. This method creates a mapping of mixture IDs, component numbers, and other relevant references for the mixtures in the model source.
+
+    Parameters
+    ----------
+    mixtures : List[Mixture]
+        A list of mixtures, where each mixture is a list of Component objects.
+    mixture_key : MixtureKey
+        The key to determine which identifier to use for the mixture.
+    mixture_keys : Optional[List[MixtureKey]], optional
+        The list of mixture keys to include in the references. If None, all keys will be included.
+    delimiter : str, optional
+        The symbol to use as a separator between the components in the mixture ID. Default is '|'.
+    case : Literal['lower', 'upper'] | None, optional
+        Convert the mixture ID to lower or upper case. Default is None.
+
+    Returns
+    -------
+    Dict[str, Any]
+        A dictionary containing the generated mixture references, including:
+        - mixture_components_num: The number of mixtures.
+        - mixture_id: A list of mixture IDs generated based on the mixture key.
+        - mixture_*: A list of mixture IDs for each specified key in mixture_keys.
+
+    Notes
+    -----
+    - The mixture ID is created by concatenating the component identifiers of each mixture, sorted alphabetically, and separated by the specified delimiter.
+    """
+    # NOTE: create mixture id
+    mixture_ids = [
+        create_mixture_id(
+            components=mixture,
+            mixture_key=mixture_key,
+            delimiter=delimiter,
+            case=case
+        ) for mixture in mixtures
+    ]
+
+    # store
+    res = {
+        "mixture_num": len(mixtures),
+        "mixture_id": mixture_ids,
+    }
+
+    # NOTE: create mixture keys
+    if mixture_keys is None:
+        mixture_keys = [
+            'Name', 'Formula', 'Name-State', 'Formula-State', 'Name-Formula'
+        ]
+
+    # iterate through mixtures
+    for mixture in mixtures:
+        for key in mixture_keys:
+            # create mixture id
+            mixture_id = create_mixture_id(
+                components=mixture,
+                mixture_key=key,
+                delimiter=delimiter,
+                case=case
+            )
+            # new key
+            key_normalized = "mixture_"+key.strip().replace("-", "_").lower()
+
+            # store
+            if key_normalized not in res:
+                res[key_normalized] = []
+
+            res[key_normalized].append(mixture_id)
+
+    # return
+    return res
+
+
 # SECTION: find component by identifier
 
 
@@ -614,7 +702,8 @@ def find_component_by_id(
             set_component_id(component, 'Formula-State', case=case) == component_id or
             set_component_id(component, 'Name-Formula', case=case) == component_id or
             set_component_id(component, 'Name-Formula-State', case=case) == component_id or
-            set_component_id(component, 'Formula-Name-State', case=case) == component_id
+            set_component_id(component, 'Formula-Name-State',
+                             case=case) == component_id
         ):
             return component
 
