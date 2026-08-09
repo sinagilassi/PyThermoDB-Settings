@@ -10,6 +10,7 @@ from .component_utils import (
     build_components_mapper,
     is_component_key,
     generate_component_references,
+    generate_mixture_references,
     find_component_by_id,
     find_components_by_ids,
 )
@@ -38,6 +39,7 @@ __all__ = [
     "build_components_mapper",
     "is_component_key",
     "generate_component_references",
+    "generate_mixture_references",
     "find_component_by_id",
     "find_components_by_ids",
 ]
