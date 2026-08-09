@@ -616,56 +616,57 @@ def generate_mixture_references(
     - Validation is performed to ensure that the mixtures list is not empty. If it is empty, an empty dictionary with mixture_num set to 0 and an empty mixture_id list is returned.
     - If mixture_keys is None, a default list of keys is used: ['Name', 'Formula', 'Name-State', 'Formula-State', 'Name-Formula'].
     """
-    # NOTE: validation
-    if len(mixtures) == 0:
-        return {
-            "mixture_num": 0,
-            "mixture_id": [],
-        }
+    try:
+        # NOTE: validation
+        if len(mixtures) == 0:
+            return {}
 
-    # NOTE: create mixture id
-    mixture_ids = [
-        create_mixture_id(
-            components=mixture,
-            mixture_key=mixture_key,
-            delimiter=delimiter,
-            case=case
-        ) for mixture in mixtures
-    ]
-
-    # store
-    res = {
-        "mixture_num": len(mixtures),
-        "mixture_id": mixture_ids,
-    }
-
-    # NOTE: create mixture keys
-    if mixture_keys is None:
-        mixture_keys = [
-            'Name', 'Formula', 'Name-State', 'Formula-State', 'Name-Formula'
-        ]
-
-    # iterate through mixtures
-    for mixture in mixtures:
-        for key in mixture_keys:
-            # create mixture id
-            mixture_id = create_mixture_id(
+        # NOTE: create mixture id
+        mixture_ids = [
+            create_mixture_id(
                 components=mixture,
-                mixture_key=key,
+                mixture_key=mixture_key,
                 delimiter=delimiter,
                 case=case
-            )
-            # new key
-            key_normalized = "mixture_"+key.strip().replace("-", "_").lower()
+            ) for mixture in mixtures
+        ]
 
-            # store
-            if key_normalized not in res:
-                res[key_normalized] = []
+        # store
+        res = {
+            "mixture_num": len(mixtures),
+            "mixture_id": mixture_ids,
+        }
 
-            res[key_normalized].append(mixture_id)
+        # NOTE: create mixture keys
+        if mixture_keys is None:
+            mixture_keys = [
+                'Name', 'Formula', 'Name-State', 'Formula-State', 'Name-Formula'
+            ]
 
-    # return
-    return res
+        # iterate through mixtures
+        for mixture in mixtures:
+            for key in mixture_keys:
+                # create mixture id
+                mixture_id = create_mixture_id(
+                    components=mixture,
+                    mixture_key=key,
+                    delimiter=delimiter,
+                    case=case
+                )
+                # new key
+                key_normalized = "mixture_"+key.strip().replace("-", "_").lower()
+
+                # store
+                if key_normalized not in res:
+                    res[key_normalized] = []
+
+                res[key_normalized].append(mixture_id)
+
+        # return
+        return res
+    except Exception as e:
+        logger.error(f"Error in generate_mixture_references: {e}")
+        return {}
 
 
 # SECTION: find component by identifier
