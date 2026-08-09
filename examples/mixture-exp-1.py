@@ -38,3 +38,11 @@ mixture_refs_custom = generate_mixture_references(
 )
 print("mixture references custom")
 print(mixture_refs_custom)
+
+# ! empty mixture list
+mixture_refs_empty = generate_mixture_references(
+    mixtures=[],
+    mixture_key="Name"
+)
+print("mixture references empty")
+print(mixture_refs_empty)
