@@ -3,7 +3,7 @@ import logging
 from typing import (
     List,
     Dict,
-    Callable,
+    Literal,
     Protocol
 )
 # locals
@@ -174,7 +174,8 @@ def component_composition(
         mixture_composition: MixtureComposition,
         component_keys: List[ComponentKey] | None = None,
         to_unit: str | None = None,
-        unit_conversion_fn: UnitConversionFn | None = None
+        unit_conversion_fn: UnitConversionFn | None = None,
+        identifier_mode: Literal['normal', 'strict'] = 'strict'
 ) -> Dict[str, CustomProp]:
     """
     Set component composition for a multi-component mixture.
@@ -189,6 +190,8 @@ def component_composition(
         Target unit for the composition values. If provided, the composition values will be converted to this unit using the provided unit_conversion_fn. Default is None.
     unit_conversion_fn : UnitConversionFn, optional
         Callable function for unit conversion. Must accept value, from_unit, and to_unit as keyword arguments and return the converted value. Required if to_unit is provided. Default is None.
+    identifier_mode : Literal['normal', 'strict'], optional
+        The mode of search for component identifiers. In 'normal' mode, the function will check against multiple identifiers (name-state, formula-state, name-formula, etc.). In 'strict' mode, it will not check Name and Formula. Default is 'normal'.
 
     Returns
     -------
@@ -226,7 +229,8 @@ def component_composition(
             # component
             comp_ = find_component_by_id(
                 id=comp_id,
-                components=mixture_composition.components
+                components=mixture_composition.components,
+                mode=identifier_mode,
             )
             # >> check
             if comp_ is None:
@@ -294,7 +298,8 @@ def set_component_composition(
         mixture_composition: MixtureComposition,
     component_keys: List[ComponentKey] | None = None,
     to_unit: str | None = None,
-    unit_conversion_fn: UnitConversionFn | None = None
+    unit_conversion_fn: UnitConversionFn | None = None,
+    identifier_mode: Literal['normal', 'strict'] = 'strict'
 ) -> Dict[str, float]:
     """
     Set component composition for a multi-component mixture.
@@ -309,6 +314,8 @@ def set_component_composition(
         Target unit for the composition values. If provided, the composition values will be converted to this unit using the provided unit_conversion_fn. Default is None.
     unit_conversion_fn : UnitConversionFn, optional
         Callable function for unit conversion. Must accept value, from_unit, and to_unit as keyword arguments and return the converted value. Required if to_unit is provided. Default is None.
+    identifier_mode : Literal['normal', 'strict'], optional
+        The mode of search for component identifiers. In 'normal' mode, the function will check against multiple identifiers (name-state, formula-state, name-formula, etc.). In 'strict' mode, it will not check Name and Formula. Default is 'normal'.
 
     Returns
     -------
@@ -321,7 +328,8 @@ def set_component_composition(
             mixture_composition=mixture_composition,
             component_keys=component_keys,
             to_unit=to_unit,
-            unit_conversion_fn=unit_conversion_fn
+            unit_conversion_fn=unit_conversion_fn,
+            identifier_mode=identifier_mode
         )
 
         # extract values from CustomProp objects
