@@ -11,12 +11,10 @@ from ..models import (
     CustomProp,
     Component,
     ComponentKey,
-    CompositionBasis,
-    CompositionReference,
-    ComponentComposition,
     MixtureComposition
 )
-from .component_utils import set_component_id
+from .component_utils import set_component_id, find_component_by_id
+
 
 # NOTE: logger
 logger = logging.getLogger(__name__)
@@ -169,8 +167,10 @@ class UnitConversionFn(Protocol):
     ) -> float:
         ...
 
+# ! component composition
 
-def set_component_composition(
+
+def component_composition(
         mixture_composition: MixtureComposition,
         component_keys: List[ComponentKey] | None = None,
         to_unit: str | None = None,
@@ -193,7 +193,7 @@ def set_component_composition(
     Returns
     -------
     Dict[str, CustomProp]
-        Dictionary with component identifiers as keys and their corresponding CustomProp objects as values.
+        Dictionary with component identifiers as keys and their corresponding CustomProp objects as values, containing the composition value and unit.
     """
     try:
         # NOTE: Validation
@@ -222,27 +222,28 @@ def set_component_composition(
         res: Dict[str, CustomProp] = {}
 
         # iterate over components to set composition
-        for component_composition in mixture_composition.components:
+        for comp_id, comp_composition in mixture_composition.compositions.items():
             # component
-            component = component_composition.component
-            # create key based on component_key
-            keys_ = [
-                set_component_id(component, key) for key in component_keys
-            ]
-
-            # composition
-            composition_ = component.X.get('composition', {})
-            # >> check if composition is valid
-            if not composition_:
+            comp_ = find_component_by_id(
+                id=comp_id,
+                components=mixture_composition.components
+            )
+            # >> check
+            if comp_ is None:
                 logger.warning(
-                    f"Component {component.name} does not have a valid composition. Skipping."
+                    f"Component with id {comp_id} not found in mixture components. Skipping."
                 )
                 continue
 
+            # create key based on component_key
+            keys_ = [
+                set_component_id(comp_, key) for key in component_keys
+            ]
+
             # create CustomProp object for composition
             custom_prop = CustomProp(
-                value=composition_.get('value', 0),
-                unit=composition_.get('unit', ''),
+                value=comp_composition.value,
+                unit=comp_composition.unit,
             )
 
             # >> check
@@ -250,7 +251,7 @@ def set_component_composition(
                 custom_prop.value is None
             ):
                 logger.warning(
-                    f"Component {component.name} does not have a valid composition value. Skipping."
+                    f"Component {comp_.name} does not have a valid composition value. Skipping."
                 )
                 continue
 
@@ -282,6 +283,53 @@ def set_component_composition(
 
         return res
 
+    except Exception as e:
+        logging.error(f"Failed to set component composition: {e}")
+        raise
+
+# ! set component composition
+
+
+def set_component_composition(
+        mixture_composition: MixtureComposition,
+    component_keys: List[ComponentKey] | None = None,
+    to_unit: str | None = None,
+    unit_conversion_fn: UnitConversionFn | None = None
+) -> Dict[str, float]:
+    """
+    Set component composition for a multi-component mixture.
+
+    Parameters
+    ----------
+    mixture_composition : MixtureComposition
+        MixtureComposition object containing the basis and components.
+    component_keys : List[ComponentKey], optional
+        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula'].
+    to_unit : str, optional
+        Target unit for the composition values. If provided, the composition values will be converted to this unit using the provided unit_conversion_fn. Default is None.
+    unit_conversion_fn : UnitConversionFn, optional
+        Callable function for unit conversion. Must accept value, from_unit, and to_unit as keyword arguments and return the converted value. Required if to_unit is provided. Default is None.
+
+    Returns
+    -------
+    Dict[str, float]
+        Dictionary with component identifiers as keys and their corresponding composition values as floats.
+    """
+    try:
+        # NOTE: call component_composition to get the composition dictionary
+        composition_dict = component_composition(
+            mixture_composition=mixture_composition,
+            component_keys=component_keys,
+            to_unit=to_unit,
+            unit_conversion_fn=unit_conversion_fn
+        )
+
+        # extract values from CustomProp objects
+        result_dict = {
+            key: prop.value for key, prop in composition_dict.items()
+        }
+
+        return result_dict
     except Exception as e:
         logging.error(f"Failed to set component composition: {e}")
         raise
