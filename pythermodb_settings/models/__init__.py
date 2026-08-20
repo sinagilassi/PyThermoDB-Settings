@@ -1,12 +1,15 @@
 # export
 from .components import (
-    COMPOSITION_METADATA,
     Component,
     ComponentIdentity,
     Mixture,
     MixtureIdentity,
     ComponentKey,
     MixtureKey,
+
+)
+from .compositions import (
+    COMPOSITION_METADATA,
     AmountBasis,
     FractionBasis,
     ConcentrationBasis,
