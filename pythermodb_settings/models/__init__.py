@@ -1,5 +1,6 @@
 # export
 from .components import (
+    COMPOSITION_METADATA,
     Component,
     ComponentIdentity,
     Mixture,
@@ -35,6 +36,7 @@ from .source import ComponentThermoDBSource, MixtureThermoDBSource
 from .constants import CustomConstant
 
 __all__ = [
+    "COMPOSITION_METADATA",
     "Component",
     "ComponentIdentity",
     "Mixture",
