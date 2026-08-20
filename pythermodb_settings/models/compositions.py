@@ -180,3 +180,35 @@ class MixtureComposition(BaseModel):
         default=None,
         description="Optional reference quantity associated with the composition basis",
     )
+
+
+# SECTION: Fraction Model
+# NOTE: mole fraction
+MixtureMoleFraction: TypeAlias = Dict[str, float]
+
+# NOTE: mass fraction
+MixtureMassFraction: TypeAlias = Dict[str, float]
+
+# NOTE: volume fraction
+MixtureVolumeFraction: TypeAlias = Dict[str, float]
+
+# NOTE: mole concentration
+MixtureMolarConcentration: TypeAlias = Dict[str, float]
+
+# NOTE: mass concentration
+MixtureMassConcentration: TypeAlias = Dict[str, float]
+
+# NOTE: molality
+MixtureMolality: TypeAlias = Dict[str, float]
+
+# NOTE: partial pressure
+MixturePartialPressure: TypeAlias = Dict[str, float]
+
+# NOTE: mole
+MixtureMoles: TypeAlias = Dict[str, float]
+
+# NOTE: mass
+MixtureMass: TypeAlias = Dict[str, float]
+
+# NOTE: volume
+MixtureVolume: TypeAlias = Dict[str, float]
