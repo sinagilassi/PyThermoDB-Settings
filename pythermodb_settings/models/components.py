@@ -6,7 +6,8 @@ from typing import (
 from pydantic import (
     BaseModel,
     Field,
-    ConfigDict
+    ConfigDict,
+    model_validator
 )
 # locals
 
@@ -40,6 +41,8 @@ class Component(BaseModel):
         State of the component: 'g' for gas, 'l' for liquid, 's' for solid, 'aq' for aqueous.
     mole_fraction : float, optional
         Mole fraction of the component in a mixture, if applicable. Default is 1.0.
+    X: dict, optional
+        Custom properties for the component. Must include 'name', 'value', 'unit', and 'symbol'. Default is an empty dictionary.
     """
     name: str = Field(..., description="Name of the component")
     formula: str = Field(..., description="Chemical formula of the component")
@@ -125,7 +128,50 @@ class MixtureIdentity(BaseModel):
 
 
 # SECTION: Composition Configuration Model
-# SECTION: Composition Configuration Model
+# NOTE: composition metadata for different bases
+COMPOSITION_METADATA = {
+    "moles": {
+        "name": "moles",
+        "symbol": "n",
+    },
+    "mass": {
+        "name": "mass",
+        "symbol": "m",
+    },
+    "volume": {
+        "name": "volume",
+        "symbol": "V",
+    },
+    "mole_fraction": {
+        "name": "mole_fraction",
+        "symbol": "x",
+    },
+    "mass_fraction": {
+        "name": "mass_fraction",
+        "symbol": "w",
+    },
+    "volume_fraction": {
+        "name": "volume_fraction",
+        "symbol": "phi",
+    },
+    "molar_concentration": {
+        "name": "molar_concentration",
+        "symbol": "c",
+    },
+    "mass_concentration": {
+        "name": "mass_concentration",
+        "symbol": "rho",
+    },
+    "molality": {
+        "name": "molality",
+        "symbol": "b",
+    },
+    "partial_pressure": {
+        "name": "partial_pressure",
+        "symbol": "p",
+    },
+}
+
 AmountBasis: TypeAlias = Literal[
     "moles",
     "mass",
@@ -219,6 +265,10 @@ class ComponentComposition(BaseModel):
         ge=0,
         description="Component composition value according to the selected basis",
     )
+    unit: str = Field(
+        ...,
+        description="Unit associated with the component composition value",
+    )
 
 
 class MixtureComposition(BaseModel):
@@ -268,3 +318,33 @@ class MixtureComposition(BaseModel):
         default=None,
         description="Optional reference quantity associated with the composition basis",
     )
+
+    @model_validator(mode="after")
+    def set_component_composition_properties(self):
+        """
+        Set the composition property in each component's ``X`` dictionary.
+
+        The property metadata is determined from the selected composition
+        basis and the component composition amount.
+
+        Returns
+        -------
+        MixtureComposition
+            Validated mixture composition with updated component properties.
+        """
+        # NOTE: retrieve metadata for the selected basis
+        metadata = COMPOSITION_METADATA.get(self.basis)
+        # >> check
+        if metadata is None:
+            raise ValueError(
+                f"Invalid composition basis: {self.basis}. Must be one of {list(COMPOSITION_METADATA.keys())}"
+            )
+
+        for component_composition in self.components:
+            component_composition.component.X['composition'] = {
+                "name": metadata["name"],
+                "value": component_composition.amount,
+                "unit": component_composition.unit,
+            }
+
+        return self
