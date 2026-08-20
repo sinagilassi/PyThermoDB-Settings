@@ -48,7 +48,7 @@ components = [CO2, H2, CH3OH, C2H5OH]
 # =======================================
 # ✅ create mixture composition
 # =======================================
-# ! composition
+# ! composition (mole fraction)
 composition = {
     'carbon dioxide': CustomProp(value=0.5, unit=''),
     'hydrogen': CustomProp(value=0.3, unit=''),
@@ -79,4 +79,40 @@ res = component_composition(
     identifier_mode='normal'  # or 'strict'
 )
 print(f"[bold blue]normal mode[/bold blue]")
+print(res)
+
+
+# ! composition (mass)
+composition = {
+    'carbon dioxide-g': CustomProp(value=0.5, unit='g'),
+    'hydrogen-g': CustomProp(value=0.0003, unit='kg'),
+    'methanol-g': CustomProp(value=0.1, unit='g'),
+    'ethanol-g': CustomProp(value=0.1, unit='g'),
+}
+
+# mixture composition
+mixture_composition = MixtureComposition(
+    basis='mass',
+    components=components,
+    compositions=composition,
+)
+
+# component composition
+res = component_composition(
+    mixture_composition=mixture_composition,
+    to_unit='kg',
+    unit_conversion_fn=unit_conversion_fn,
+    identifier_mode='strict'  # default
+)
+print(f"[bold green]strict mode[/bold green]")
+print(res)
+
+# ! set component composition
+res = set_component_composition(
+    mixture_composition=mixture_composition,
+    to_unit='kg',
+    unit_conversion_fn=unit_conversion_fn,
+    identifier_mode='strict'  # default
+)
+print(f"[bold blue]set component composition[/bold blue]")
 print(res)
