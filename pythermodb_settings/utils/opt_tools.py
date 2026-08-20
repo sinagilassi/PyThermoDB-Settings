@@ -4,14 +4,25 @@ from typing import (
     List,
     Dict,
     Literal,
-    Protocol
+    Protocol,
+    Any
 )
 # locals
 from ..models import (
     CustomProp,
     Component,
     ComponentKey,
-    MixtureComposition
+    MixtureComposition,
+    MixtureMoleFraction,
+    MixtureMassFraction,
+    MixtureVolumeFraction,
+    MixtureMolarConcentration,
+    MixtureMassConcentration,
+    MixtureMolality,
+    MixturePartialPressure,
+    MixtureMoles,
+    MixtureMass,
+    MixtureVolume
 )
 from .component_utils import set_component_id, find_component_by_id
 
@@ -341,3 +352,142 @@ def set_component_composition(
     except Exception as e:
         logging.error(f"Failed to set component composition: {e}")
         raise
+
+# SECTION: Config molar composition
+
+
+def _set_mixture_composition(
+        composition: Dict[str, float],
+        components: List[Component],
+        component_keys: List[ComponentKey] | None = None,
+        identifier_mode: Literal['normal', 'strict'] = 'strict'
+) -> Dict[str, float]:
+    """
+    Set composition for a multi-component mixture.
+
+    Parameters
+    ----------
+    composition : Dict[str, float]
+        Dictionary with component identifiers as keys and their corresponding mole fractions as values.
+    components : List[Component]
+        List of Component objects, each with name, formula, and state attributes.
+    component_keys : List[ComponentKey], optional
+        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula'].
+    identifier_mode : Literal['normal', 'strict'], optional
+        The mode of search for component identifiers. In 'normal' mode, the function will check against multiple identifiers (name-state, formula-state, name-formula, etc.). In 'strict' mode, it will not check Name and Formula. Default is 'normal'.
+
+    Returns
+    -------
+    Dict[str, float]
+        Dictionary with component identifiers as keys and their corresponding mole fractions as values.
+    """
+    try:
+        # set default component_keys if not provided
+        if component_keys is None:
+            component_keys = [
+                'Name-State',
+                'Formula-State',
+                'Name-Formula'
+            ]
+
+        # NOTE: Initialize result dictionary
+        result_dict: Dict[str, float] = {}
+
+        # iterate over composition to set molar composition
+        for comp_id, mole_fraction in composition.items():
+            # find component by id
+            comp_ = find_component_by_id(
+                id=comp_id,
+                components=components,
+                mode=identifier_mode,
+            )
+            # >> check
+            if comp_ is None:
+                logger.warning(
+                    f"Component with id {comp_id} not found in components. Skipping."
+                )
+                continue
+
+            # create key based on component_key
+            keys_ = [
+                set_component_id(comp_, key) for key in component_keys
+            ]
+
+            # add to result dictionary
+            for key in keys_:
+                result_dict[key] = mole_fraction
+
+        return result_dict
+    except Exception as e:
+        logging.error(f"Failed to set mixture composition: {e}")
+        raise
+
+# NOTE: mole fraction composition
+
+
+def set_mixture_mole_fraction(
+        composition: Dict[str, float],
+        components: List[Component],
+        component_keys: List[ComponentKey] | None = None,
+        identifier_mode: Literal['normal', 'strict'] = 'strict'
+) -> MixtureMoleFraction:
+    """
+    Set mole fraction composition for a multi-component mixture.
+
+    Parameters
+    ----------
+    composition : Dict[str, float]
+        Dictionary with component identifiers as keys and their corresponding mole fractions as values.
+    components : List[Component]
+        List of Component objects, each with name, formula, and state attributes.
+    component_keys : List[ComponentKey], optional
+        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula'].
+    identifier_mode : Literal['normal', 'strict'], optional
+        The mode of search for component identifiers. In 'normal' mode, the function will check against multiple identifiers (name-state, formula-state, name-formula, etc.). In 'strict' mode, it will not check Name and Formula. Default is 'normal'.
+
+    Returns
+    -------
+    MixtureMoleFraction
+        Dictionary with component identifiers as keys and their corresponding mole fractions as values.
+    """
+    return _set_mixture_composition(
+        composition=composition,
+        components=components,
+        component_keys=component_keys,
+        identifier_mode=identifier_mode
+    )
+
+# NOTE: mass fraction composition
+
+
+def set_mixture_mass_fraction(
+        composition: Dict[str, float],
+        components: List[Component],
+        component_keys: List[ComponentKey] | None = None,
+        identifier_mode: Literal['normal', 'strict'] = 'strict'
+) -> MixtureMassFraction:
+    """
+    Set mass fraction composition for a multi-component mixture.
+
+    Parameters
+    ----------
+    composition : Dict[str, float]
+        Dictionary with component identifiers as keys and their corresponding mass fractions as values.
+    components : List[Component]
+        List of Component objects, each with name, formula, and state attributes.
+    component_keys : List[ComponentKey], optional
+        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula'].
+    identifier_mode : Literal['normal', 'strict'], optional
+        The mode of search for component identifiers. In 'normal' mode, the function will check against multiple identifiers (name-state, formula-state, name-formula, etc.). In 'strict' mode, it will not check Name and Formula. Default is 'normal'.
+
+    Returns
+    -------
+    MixtureMassFraction
+        Dictionary with component identifiers as keys and their corresponding mass fractions as values.
+    """
+    return _set_mixture_composition(
+        composition=composition,
+        components=components,
+        component_keys=component_keys,
+        identifier_mode=identifier_mode
+    )
