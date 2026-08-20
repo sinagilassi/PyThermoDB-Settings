@@ -712,8 +712,11 @@ def find_component_by_id(
             set_component_id(component, 'Formula-State', case=case) == component_id or
             set_component_id(component, 'Name-Formula', case=case) == component_id or
             set_component_id(component, 'Name-Formula-State', case=case) == component_id or
-            set_component_id(component, 'Formula-Name-State',
-                             case=case) == component_id
+            set_component_id(
+                component,
+                'Formula-Name-State',
+                case=case
+            ) == component_id
         ):
             return component
 
