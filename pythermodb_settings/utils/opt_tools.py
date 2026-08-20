@@ -491,3 +491,275 @@ def set_mixture_mass_fraction(
         component_keys=component_keys,
         identifier_mode=identifier_mode
     )
+
+
+def set_mixture_volume_fraction(
+        composition: Dict[str, float],
+        components: List[Component],
+        component_keys: List[ComponentKey] | None = None,
+        identifier_mode: Literal['normal', 'strict'] = 'strict'
+) -> MixtureVolumeFraction:
+    """
+    Set volume fraction composition for a multi-component mixture.
+
+    Parameters
+    ----------
+    composition : Dict[str, float]
+        Dictionary with component identifiers as keys and volume fractions as values.
+    components : List[Component]
+        Components used to resolve the input identifiers.
+    component_keys : List[ComponentKey], optional
+        Identifiers to include for each resolved component. Defaults to
+        ['Name-State', 'Formula-State', 'Name-Formula'].
+    identifier_mode : Literal['normal', 'strict'], optional
+        Component identifier matching mode. Defaults to 'strict'.
+
+    Returns
+    -------
+    MixtureVolumeFraction
+        Volume fractions keyed by the requested component identifiers.
+    """
+    return _set_mixture_composition(
+        composition=composition,
+        components=components,
+        component_keys=component_keys,
+        identifier_mode=identifier_mode
+    )
+
+
+def set_mixture_molar_concentration(
+        composition: Dict[str, float],
+        components: List[Component],
+        component_keys: List[ComponentKey] | None = None,
+        identifier_mode: Literal['normal', 'strict'] = 'strict'
+) -> MixtureMolarConcentration:
+    """
+    Set molar concentration composition for a multi-component mixture.
+
+    Parameters
+    ----------
+    composition : Dict[str, float]
+        Dictionary with component identifiers as keys and molar concentrations as values.
+    components : List[Component]
+        Components used to resolve the input identifiers.
+    component_keys : List[ComponentKey], optional
+        Identifiers to include for each resolved component. Defaults to
+        ['Name-State', 'Formula-State', 'Name-Formula'].
+    identifier_mode : Literal['normal', 'strict'], optional
+        Component identifier matching mode. Defaults to 'strict'.
+
+    Returns
+    -------
+    MixtureMolarConcentration
+        Molar concentrations keyed by the requested component identifiers.
+    """
+    return _set_mixture_composition(
+        composition=composition,
+        components=components,
+        component_keys=component_keys,
+        identifier_mode=identifier_mode
+    )
+
+
+def set_mixture_mass_concentration(
+        composition: Dict[str, float],
+        components: List[Component],
+        component_keys: List[ComponentKey] | None = None,
+        identifier_mode: Literal['normal', 'strict'] = 'strict'
+) -> MixtureMassConcentration:
+    """
+    Set mass concentration composition for a multi-component mixture.
+
+    Parameters
+    ----------
+    composition : Dict[str, float]
+        Dictionary with component identifiers as keys and mass concentrations as values.
+    components : List[Component]
+        Components used to resolve the input identifiers.
+    component_keys : List[ComponentKey], optional
+        Identifiers to include for each resolved component. Defaults to
+        ['Name-State', 'Formula-State', 'Name-Formula'].
+    identifier_mode : Literal['normal', 'strict'], optional
+        Component identifier matching mode. Defaults to 'strict'.
+
+    Returns
+    -------
+    MixtureMassConcentration
+        Mass concentrations keyed by the requested component identifiers.
+    """
+    return _set_mixture_composition(
+        composition=composition,
+        components=components,
+        component_keys=component_keys,
+        identifier_mode=identifier_mode
+    )
+
+
+def set_mixture_molality(
+        composition: Dict[str, float],
+        components: List[Component],
+        component_keys: List[ComponentKey] | None = None,
+        identifier_mode: Literal['normal', 'strict'] = 'strict'
+) -> MixtureMolality:
+    """
+    Set molality composition for a multi-component mixture.
+
+    Parameters
+    ----------
+    composition : Dict[str, float]
+        Dictionary with component identifiers as keys and molalities as values.
+    components : List[Component]
+        Components used to resolve the input identifiers.
+    component_keys : List[ComponentKey], optional
+        Identifiers to include for each resolved component. Defaults to
+        ['Name-State', 'Formula-State', 'Name-Formula'].
+    identifier_mode : Literal['normal', 'strict'], optional
+        Component identifier matching mode. Defaults to 'strict'.
+
+    Returns
+    -------
+    MixtureMolality
+        Molalities keyed by the requested component identifiers.
+    """
+    return _set_mixture_composition(
+        composition=composition,
+        components=components,
+        component_keys=component_keys,
+        identifier_mode=identifier_mode
+    )
+
+
+def set_mixture_partial_pressure(
+        composition: Dict[str, float],
+        components: List[Component],
+        component_keys: List[ComponentKey] | None = None,
+        identifier_mode: Literal['normal', 'strict'] = 'strict'
+) -> MixturePartialPressure:
+    """
+    Set partial pressure composition for a multi-component mixture.
+
+    Parameters
+    ----------
+    composition : Dict[str, float]
+        Dictionary with component identifiers as keys and partial pressures as values.
+    components : List[Component]
+        Components used to resolve the input identifiers.
+    component_keys : List[ComponentKey], optional
+        Identifiers to include for each resolved component. Defaults to
+        ['Name-State', 'Formula-State', 'Name-Formula'].
+    identifier_mode : Literal['normal', 'strict'], optional
+        Component identifier matching mode. Defaults to 'strict'.
+
+    Returns
+    -------
+    MixturePartialPressure
+        Partial pressures keyed by the requested component identifiers.
+    """
+    return _set_mixture_composition(
+        composition=composition,
+        components=components,
+        component_keys=component_keys,
+        identifier_mode=identifier_mode
+    )
+
+
+def set_mixture_moles(
+        composition: Dict[str, float],
+        components: List[Component],
+        component_keys: List[ComponentKey] | None = None,
+        identifier_mode: Literal['normal', 'strict'] = 'strict'
+) -> MixtureMoles:
+    """
+    Set component moles for a multi-component mixture.
+
+    Parameters
+    ----------
+    composition : Dict[str, float]
+        Dictionary with component identifiers as keys and component moles as values.
+    components : List[Component]
+        Components used to resolve the input identifiers.
+    component_keys : List[ComponentKey], optional
+        Identifiers to include for each resolved component. Defaults to
+        ['Name-State', 'Formula-State', 'Name-Formula'].
+    identifier_mode : Literal['normal', 'strict'], optional
+        Component identifier matching mode. Defaults to 'strict'.
+
+    Returns
+    -------
+    MixtureMoles
+        Component moles keyed by the requested component identifiers.
+    """
+    return _set_mixture_composition(
+        composition=composition,
+        components=components,
+        component_keys=component_keys,
+        identifier_mode=identifier_mode
+    )
+
+
+def set_mixture_mass(
+        composition: Dict[str, float],
+        components: List[Component],
+        component_keys: List[ComponentKey] | None = None,
+        identifier_mode: Literal['normal', 'strict'] = 'strict'
+) -> MixtureMass:
+    """
+    Set component masses for a multi-component mixture.
+
+    Parameters
+    ----------
+    composition : Dict[str, float]
+        Dictionary with component identifiers as keys and component masses as values.
+    components : List[Component]
+        Components used to resolve the input identifiers.
+    component_keys : List[ComponentKey], optional
+        Identifiers to include for each resolved component. Defaults to
+        ['Name-State', 'Formula-State', 'Name-Formula'].
+    identifier_mode : Literal['normal', 'strict'], optional
+        Component identifier matching mode. Defaults to 'strict'.
+
+    Returns
+    -------
+    MixtureMass
+        Component masses keyed by the requested component identifiers.
+    """
+    return _set_mixture_composition(
+        composition=composition,
+        components=components,
+        component_keys=component_keys,
+        identifier_mode=identifier_mode
+    )
+
+
+def set_mixture_volume(
+        composition: Dict[str, float],
+        components: List[Component],
+        component_keys: List[ComponentKey] | None = None,
+        identifier_mode: Literal['normal', 'strict'] = 'strict'
+) -> MixtureVolume:
+    """
+    Set component volumes for a multi-component mixture.
+
+    Parameters
+    ----------
+    composition : Dict[str, float]
+        Dictionary with component identifiers as keys and component volumes as values.
+    components : List[Component]
+        Components used to resolve the input identifiers.
+    component_keys : List[ComponentKey], optional
+        Identifiers to include for each resolved component. Defaults to
+        ['Name-State', 'Formula-State', 'Name-Formula'].
+    identifier_mode : Literal['normal', 'strict'], optional
+        Component identifier matching mode. Defaults to 'strict'.
+
+    Returns
+    -------
+    MixtureVolume
+        Component volumes keyed by the requested component identifiers.
+    """
+    return _set_mixture_composition(
+        composition=composition,
+        components=components,
+        component_keys=component_keys,
+        identifier_mode=identifier_mode
+    )
