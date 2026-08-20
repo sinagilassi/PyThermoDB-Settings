@@ -23,6 +23,7 @@ from .tools import (
 # opt tools
 from .opt_tools import (
     set_feed_specification,
+    component_composition,
     set_component_composition,
 )
 
@@ -43,5 +44,6 @@ __all__ = [
     "generate_mixture_references",
     "find_component_by_id",
     "find_components_by_ids",
+    "component_composition",
     "set_component_composition",
 ]
