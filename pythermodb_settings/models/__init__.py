@@ -18,6 +18,16 @@ from .compositions import (
     CompositionReference,
     ComponentComposition,
     MixtureComposition,
+    MixtureMoleFraction,
+    MixtureMassFraction,
+    MixtureVolumeFraction,
+    MixtureMolarConcentration,
+    MixtureMassConcentration,
+    MixtureMolality,
+    MixturePartialPressure,
+    MixtureMoles,
+    MixtureMass,
+    MixtureVolume
 )
 from .conditions import (
     Temperature,
@@ -69,4 +79,12 @@ __all__ = [
     "CompositionReference",
     "ComponentComposition",
     "MixtureComposition",
+    "MixtureMoleFraction",
+    "MixtureMassFraction",
+    "MixtureVolumeFraction",
+    "MixtureMolarConcentration",
+    "MixtureMassConcentration",
+    "MixtureMolality",
+    "MixturePartialPressure",
+    "MixtureMoles",
 ]
