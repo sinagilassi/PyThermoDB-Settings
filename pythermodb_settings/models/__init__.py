@@ -5,9 +5,23 @@ from .components import (
     Mixture,
     MixtureIdentity,
     ComponentKey,
-    MixtureKey
+    MixtureKey,
+    AmountBasis,
+    FractionBasis,
+    ConcentrationBasis,
+    GasCompositionBasis,
+    CompositionBasis,
+    CompositionReference,
+    ComponentComposition,
+    MixtureComposition,
 )
-from .conditions import Temperature, Pressure, Volume, CustomProp, CustomProperty
+from .conditions import (
+    Temperature,
+    Pressure,
+    Volume,
+    CustomProp,
+    CustomProperty
+)
 from .configs import ComponentConfig
 from .references import (
     ReferenceThermoDB,
@@ -41,5 +55,13 @@ __all__ = [
     "ComponentRule",
     "ComponentThermoDBSource",
     "MixtureThermoDBSource",
-    "CustomConstant"
+    "CustomConstant",
+    "AmountBasis",
+    "FractionBasis",
+    "ConcentrationBasis",
+    "GasCompositionBasis",
+    "CompositionBasis",
+    "CompositionReference",
+    "ComponentComposition",
+    "MixtureComposition",
 ]
