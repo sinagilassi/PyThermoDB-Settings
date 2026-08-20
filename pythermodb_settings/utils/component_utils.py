@@ -675,7 +675,8 @@ def generate_mixture_references(
 def find_component_by_id(
         id: str,
         components: List[Component],
-        case_sensitive: bool = True
+        case_sensitive: bool = True,
+        mode: Literal['normal', 'strict'] = 'normal'
 ) -> Optional[Component]:
     """
     Find a component in the list of components by its identifier.
@@ -688,6 +689,8 @@ def find_component_by_id(
         The list of components to search.
     case_sensitive : bool, optional
         Whether the search should be case-sensitive. Default is True.
+    mode : Literal['normal', 'strict'], optional
+        The mode of search. In 'normal' mode, the function will check against multiple identifiers (name-state, formula-state, name-formula, etc.). In 'strict' mode, it will not check Name and Formula.
 
     Returns
     -------
@@ -721,11 +724,20 @@ def find_component_by_id(
             return component
 
         # ! for 'Name' and 'Formula' keys, check if the id matches the component's name or formula directly
-        if (
-            set_component_id(component, 'Name', case=case) == component_id or
-            set_component_id(component, 'Formula', case=case) == component_id
-        ):
-            return component
+        if mode == 'normal':
+            if (
+                set_component_id(
+                    component,
+                    'Name',
+                    case=case
+                ) == component_id or
+                set_component_id(
+                    component,
+                    'Formula',
+                    case=case
+                ) == component_id
+            ):
+                return component
     return None
 
 
