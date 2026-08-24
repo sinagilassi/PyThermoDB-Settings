@@ -58,8 +58,6 @@ def set_feed_specification(
         for i, component in enumerate(components):
             # set
             name_ = component.name
-            formula_ = component.formula
-            state_ = component.state
 
             # Check if mole_fraction is provided, otherwise skip
             if component.mole_fraction is None:
@@ -68,26 +66,12 @@ def set_feed_specification(
                 continue
 
             # NOTE: Set feed specification
-            if component_key == 'Name-State':
-                feed_spec[f"{name_}-{state_}"] = component.mole_fraction
-            elif component_key == 'Formula-State':
-                feed_spec[f"{formula_}-{state_}"] = component.mole_fraction
-            elif component_key == 'Name-Formula':
-                feed_spec[f"{name_}-{formula_}"] = component.mole_fraction
-            elif component_key == 'Name':
-                feed_spec[name_] = component.mole_fraction
-            elif component_key == 'Formula':
-                feed_spec[formula_] = component.mole_fraction
-            elif component_key == 'Name-Formula-State':
-                feed_spec[f"{name_}-{formula_}-{state_}"] = component.mole_fraction
-            elif component_key == 'Formula-Name-State':
-                feed_spec[f"{formula_}-{name_}-{state_}"] = component.mole_fraction
-            else:
-                # raise ValueError("Invalid component_key. Use 'name' or 'formula'.")
-                logging.error(
-                    f"Invalid component_key: {component_key}. Use 'name' or 'formula'.")
-                raise ValueError(
-                    f"Invalid component_key: {component_key}. Use 'name' or 'formula'.")
+            feed_spec[
+                set_component_id(
+                    component=component,
+                    component_key=component_key
+                )
+            ] = component.mole_fraction
 
         return feed_spec
     except Exception as e:
