@@ -9,6 +9,7 @@ from pydantic import (
     BaseModel,
     Field,
     ConfigDict,
+    field_validator,
     model_validator,
 )
 # locals
@@ -33,15 +34,36 @@ _FORMULA_CHARGE_PATTERN = re.compile(
 )
 
 
-def _parse_formula_charge(formula: str) -> float | None:
+def _parse_formula_charge(formula: str) -> int | None:
     match = _FORMULA_CHARGE_PATTERN.search(formula.strip())
     if match is None:
         return None
 
     sign = match.group("sign") or match.group("unit_sign")
     magnitude = match.group("magnitude")
-    charge = float(magnitude) if magnitude is not None else 1.0
+    charge = _coerce_charge_int(magnitude) if magnitude is not None else 1
     return charge if sign == "+" else -charge
+
+
+def _coerce_charge_int(value: Any) -> int:
+    if isinstance(value, bool):
+        raise ValueError("Charge must be an integer.")
+
+    if isinstance(value, int):
+        return value
+
+    if isinstance(value, float):
+        if value.is_integer():
+            return int(value)
+        raise ValueError("Charge must be an integer.")
+
+    if isinstance(value, str):
+        value_str = value.strip()
+        if re.fullmatch(r"[+-]?\d+", value_str):
+            return int(value_str)
+        raise ValueError("Charge must be an integer.")
+
+    raise ValueError("Charge must be an integer.")
 
 
 class Component(BaseModel):
@@ -69,7 +91,7 @@ class Component(BaseModel):
         ...,
         description="State of the component: 'g' for gas, 'l' for liquid, 's' for solid, 'aq' for aqueous"
     )
-    charge: float = Field(
+    charge: int = Field(
         default=0,
         description="Charge of the component, if applicable"
     )
@@ -82,6 +104,11 @@ class Component(BaseModel):
         default_factory=dict,
         description="Custom properties for the component must include 'name', 'value', 'unit', 'symbol"
     )
+
+    @field_validator("charge", mode="before")
+    @classmethod
+    def validate_charge(cls, value: Any) -> int:
+        return _coerce_charge_int(value)
 
     @model_validator(mode="before")
     @classmethod
@@ -102,7 +129,7 @@ class Component(BaseModel):
             data["charge"] = formula_charge
             return data
 
-        charge = float(data["charge"])
+        charge = _coerce_charge_int(data["charge"])
         if charge != formula_charge:
             raise ValueError(
                 "Component formula charge and charge field are inconsistent: "
