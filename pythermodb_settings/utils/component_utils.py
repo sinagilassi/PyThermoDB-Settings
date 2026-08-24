@@ -15,27 +15,6 @@ from ..models import (
 logger = logging.getLogger(__name__)
 
 
-# ::: Format Charge :::
-def _format_charge(charge: float) -> str:
-    if charge == 0:
-        return ""
-
-    sign = "+" if charge > 0 else "-"
-    magnitude = abs(charge)
-
-    if magnitude == 1:
-        return f"{{{sign}}}"
-
-    if float(magnitude).is_integer():
-        magnitude = int(magnitude)
-
-    return f"{{{magnitude}{sign}}}"
-
-
-def _format_formula(formula: str, charge: float) -> str:
-    return f"{formula.strip()}{_format_charge(charge)}"
-
-
 # ::: Create Component Identifiers :::
 def create_component_id(
     component: Component,
@@ -60,14 +39,8 @@ def create_component_id(
     try:
         # NOTE: extract component name
         component_name = component.name.strip()
-        component_formula = _format_formula(
-            component.formula,
-            component.charge
-        )
+        component_formula = component.formula.strip()
         component_state = component.state.strip().lower()
-
-        # >> separator
-        separator_symbol = separator_symbol.strip()
 
         # SECTION: create component identifiers
         name_state = f"{component_name}{separator_symbol}{component_state}"
@@ -141,11 +114,11 @@ def set_component_id(
         elif component_key == "Name":
             component_id = component.name.strip()
         elif component_key == "Formula":
-            component_id = _format_formula(component.formula, component.charge)
+            component_id = component.formula.strip()
         elif component_key == "Name-Formula-State":
             component_id = f"{component_idx.name_formula.strip()}{separator_symbol}{component.state.strip().lower()}"
         elif component_key == "Formula-Name-State":
-            component_id = f"{_format_formula(component.formula, component.charge)}{separator_symbol}{component.name.strip()}{separator_symbol}{component.state.strip().lower()}"
+            component_id = f"{component.formula.strip()}{separator_symbol}{component.name.strip()}{separator_symbol}{component.state.strip().lower()}"
         else:
             raise ValueError(
                 f"Invalid component_key '{component_key}'. "
