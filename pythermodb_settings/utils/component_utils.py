@@ -15,6 +15,28 @@ from ..models import (
 logger = logging.getLogger(__name__)
 
 
+# ::: Format Charge :::
+def _format_charge(charge: float) -> str:
+    if charge == 0:
+        return ""
+
+    sign = "+" if charge > 0 else "-"
+    magnitude = abs(charge)
+
+    if magnitude == 1:
+        return f"{{{sign}}}"
+
+    if float(magnitude).is_integer():
+        magnitude = int(magnitude)
+
+    return f"{{{magnitude}{sign}}}"
+
+
+def _format_formula(formula: str, charge: float) -> str:
+    return f"{formula.strip()}{_format_charge(charge)}"
+
+
+# ::: Create Component Identifiers :::
 def create_component_id(
     component: Component,
     separator_symbol: str = '-'
@@ -38,7 +60,10 @@ def create_component_id(
     try:
         # NOTE: extract component name
         component_name = component.name.strip()
-        component_formula = component.formula.strip()
+        component_formula = _format_formula(
+            component.formula,
+            component.charge
+        )
         component_state = component.state.strip().lower()
 
         # >> separator
@@ -116,15 +141,15 @@ def set_component_id(
         elif component_key == "Name":
             component_id = component.name.strip()
         elif component_key == "Formula":
-            component_id = component.formula.strip()
+            component_id = _format_formula(component.formula, component.charge)
         elif component_key == "Name-Formula-State":
-            component_id = f"{component.name.strip()}{separator_symbol}{component.formula.strip()}{separator_symbol}{component.state.strip().lower()}"
+            component_id = f"{component_idx.name_formula.strip()}{separator_symbol}{component.state.strip().lower()}"
         elif component_key == "Formula-Name-State":
-            component_id = f"{component.formula.strip()}{separator_symbol}{component.name.strip()}{separator_symbol}{component.state.strip().lower()}"
+            component_id = f"{_format_formula(component.formula, component.charge)}{separator_symbol}{component.name.strip()}{separator_symbol}{component.state.strip().lower()}"
         else:
             raise ValueError(
                 f"Invalid component_key '{component_key}'. "
-                f"Must be 'Name-State' or 'Formula-State'."
+                f"Must be one of: {', '.join(_VALID_COMPONENT_KEYS)}."
             )
 
         # NOTE: apply conversion
@@ -210,11 +235,11 @@ def create_binary_mixture_id(
 
         # SECTION: get component IDs
         if mixture_key == 'Name':
-            comp1_id = component_1.name.strip()
-            comp2_id = component_2.name.strip()
+            comp1_id = set_component_id(component_1, 'Name')
+            comp2_id = set_component_id(component_2, 'Name')
         elif mixture_key == 'Formula':
-            comp1_id = component_1.formula.strip()
-            comp2_id = component_2.formula.strip()
+            comp1_id = set_component_id(component_1, 'Formula')
+            comp2_id = set_component_id(component_2, 'Formula')
         else:
             raise ValueError(
                 "component_key must be either 'Name' or 'Formula'"
@@ -289,27 +314,13 @@ def create_mixture_id(
         delimiter = delimiter.strip()
 
         # SECTION: get component IDs
-        component_ids = []
-        for comp in components:
-            if mixture_key == 'Name':
-                comp_id = comp.name.strip()
-            elif mixture_key == 'Formula':
-                comp_id = comp.formula.strip()
-            elif mixture_key == 'Name-State':
-                comp_id = f"{comp.name.strip()}-{comp.state.strip()}"
-            elif mixture_key == 'Formula-State':
-                comp_id = f"{comp.formula.strip()}-{comp.state.strip()}"
-            elif mixture_key == 'Name-Formula':
-                comp_id = f"{comp.name.strip()}-{comp.formula.strip()}"
-            elif mixture_key == 'Name-Formula-State':
-                comp_id = f"{comp.name.strip()}-{comp.formula.strip()}-{comp.state.strip()}"
-            elif mixture_key == 'Formula-Name-State':
-                comp_id = f"{comp.formula.strip()}-{comp.name.strip()}-{comp.state.strip()}"
-            else:
-                raise ValueError(
-                    "component_key must be one of the following: Name, Formula, Name-State, Formula-State, Name-Formula-State, Formula-Name-State"
-                )
-            component_ids.append(comp_id)
+        component_ids = [
+            set_component_id(
+                component=comp,
+                component_key=mixture_key
+            )
+            for comp in components
+        ]
 
         # SECTION: create unique mixture ID (sorted to ensure uniqueness)
         # ! sorted alphabetically
