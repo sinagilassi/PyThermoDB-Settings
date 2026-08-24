@@ -5,7 +5,6 @@ from copy import deepcopy
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple, Set, Union, Literal
 from pythermodb_settings.utils import measure_time, set_component_id
-from pythermodb_settings.utils.component_utils import _format_formula
 # locals
 from ..models import ComponentKey, Component
 from .yaml_extractor import YAMLExtractor
@@ -520,11 +519,16 @@ class ComponentExtractor:
                     state_value, allowed_states, row
                 )
                 return None
+            component_data: Dict[str, Any] = {
+                "name": str(name).strip(),
+                "formula": str(formula).strip(),
+                "state": state_value,  # type: ignore
+            }
+            if charge is not None and str(charge).strip() != "":
+                component_data["charge"] = self._parse_charge(charge)
+
             return Component(
-                name=str(name).strip(),
-                formula=str(formula).strip(),
-                state=state_value,  # type: ignore
-                charge=self._parse_charge(charge)
+                **component_data
             )
         except Exception as exc:
             logger.debug(
@@ -550,12 +554,7 @@ class ComponentExtractor:
         if component_key == "Name":
             return self._normalize_key(name, separator_symbol, case_mode) if name else None
         if component_key == "Formula":
-            charge = self._get_column_value(row, column_lookup.get("charge"))
-            formula_key = _format_formula(
-                formula,
-                self._parse_charge(charge)
-            ) if formula else None
-            return self._normalize_key(formula_key, separator_symbol, case_mode) if formula_key else None
+            return self._normalize_key(formula, separator_symbol, case_mode) if formula else None
 
         component = self._row_to_component(row, column_lookup)
         if component is None:
@@ -586,7 +585,7 @@ class ComponentExtractor:
         except (TypeError, IndexError):
             return None
 
-    def _parse_charge(self, value: Optional[str]) -> float:
+    def _parse_charge(self, value: Optional[str]) -> int:
         """Parse an optional charge cell value, defaulting missing values to zero."""
         if value is None:
             return 0
@@ -596,10 +595,9 @@ class ComponentExtractor:
             return 0
 
         try:
-            return float(value_str)
+            return int(value_str)
         except ValueError:
-            logger.debug("Invalid charge value '%s'; defaulting to 0.", value)
-            return 0
+            raise ValueError(f"Invalid integer charge value: {value!r}")
 
     def _join_parts(self, parts: List[Optional[str]], sep: str) -> Optional[str]:
         """Join non-empty components with the provided separator."""
