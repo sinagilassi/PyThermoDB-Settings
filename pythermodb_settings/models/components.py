@@ -39,6 +39,8 @@ class Component(BaseModel):
         Chemical formula of the component.
     state : Literal['g', 'l', 's', 'aq']
         State of the component: 'g' for gas, 'l' for liquid, 's' for solid, 'aq' for aqueous.
+    charge : int, optional
+        Charge of the component, if applicable. Default is 0.
     mole_fraction : float, optional
         Mole fraction of the component in a mixture, if applicable. Default is 1.0.
     X: dict, optional
@@ -49,6 +51,10 @@ class Component(BaseModel):
     state: Literal['g', 'l', 's', 'aq'] = Field(
         ...,
         description="State of the component: 'g' for gas, 'l' for liquid, 's' for solid, 'aq' for aqueous"
+    )
+    charge: float = Field(
+        default=0,
+        description="Charge of the component, if applicable"
     )
     mole_fraction: float = Field(
         default=0,
