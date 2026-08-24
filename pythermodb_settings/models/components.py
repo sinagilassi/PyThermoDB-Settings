@@ -1,12 +1,15 @@
 # import libs
+import re
 from typing import (
     Literal,
     TypeAlias,
+    Any,
 )
 from pydantic import (
     BaseModel,
     Field,
     ConfigDict,
+    model_validator,
 )
 # locals
 
@@ -25,6 +28,20 @@ ComponentKey = Literal[
 MixtureKey = ComponentKey
 
 # SECTION: Component model
+_FORMULA_CHARGE_PATTERN = re.compile(
+    r"\{(?:(?P<magnitude>\d+(?:\.\d+)?)(?P<sign>[+-])|(?P<unit_sign>[+-]))\}\s*$"
+)
+
+
+def _parse_formula_charge(formula: str) -> float | None:
+    match = _FORMULA_CHARGE_PATTERN.search(formula.strip())
+    if match is None:
+        return None
+
+    sign = match.group("sign") or match.group("unit_sign")
+    magnitude = match.group("magnitude")
+    charge = float(magnitude) if magnitude is not None else 1.0
+    return charge if sign == "+" else -charge
 
 
 class Component(BaseModel):
@@ -65,6 +82,34 @@ class Component(BaseModel):
         default_factory=dict,
         description="Custom properties for the component must include 'name', 'value', 'unit', 'symbol"
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def set_charge_from_formula(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+
+        formula = data.get("formula")
+        if not isinstance(formula, str):
+            return data
+
+        formula_charge = _parse_formula_charge(formula)
+        if formula_charge is None:
+            return data
+
+        if "charge" not in data or data.get("charge") is None:
+            data = dict(data)
+            data["charge"] = formula_charge
+            return data
+
+        charge = float(data["charge"])
+        if charge != formula_charge:
+            raise ValueError(
+                "Component formula charge and charge field are inconsistent: "
+                f"formula={formula!r}, charge={data['charge']!r}"
+            )
+
+        return data
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
