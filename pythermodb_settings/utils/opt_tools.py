@@ -31,6 +31,13 @@ from .component_utils import set_component_id, find_component_by_id
 logger = logging.getLogger(__name__)
 
 
+_DEFAULT_COMPONENT_KEYS: List[ComponentKey] = [
+    'Name-State',
+    'Formula-State',
+    'Name-Formula-State'
+]
+
+
 def set_feed_specification(
     components: List[Component],
     component_key: ComponentKey = 'Name-State',
@@ -180,7 +187,7 @@ def component_composition(
     mixture_composition : MixtureComposition
         MixtureComposition object containing the basis and components.
     component_keys : List[ComponentKey], optional
-        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula'].
+        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula-State'].
     to_unit : str, optional
         Target unit for the composition values. If provided, the composition values will be converted to this unit using the provided unit_conversion_fn. Default is None.
     unit_conversion_fn : UnitConversionFn, optional
@@ -208,13 +215,8 @@ def component_composition(
                 "unit_conversion_fn must be provided when to_unit is specified."
             )
 
-        # set default component_keys if not provided
         if component_keys is None:
-            component_keys = [
-                'Name-State',
-                'Formula-State',
-                'Name-Formula'
-            ]
+            component_keys = _DEFAULT_COMPONENT_KEYS
 
         # NOTE: retrieve X
         res: Dict[str, CustomProp] = {}
@@ -304,7 +306,7 @@ def set_component_composition(
     mixture_composition : MixtureComposition
         MixtureComposition object containing the basis and components.
     component_keys : List[ComponentKey], optional
-        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula'].
+        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula-State'].
     to_unit : str, optional
         Target unit for the composition values. If provided, the composition values will be converted to this unit using the provided unit_conversion_fn. Default is None.
     unit_conversion_fn : UnitConversionFn, optional
@@ -356,7 +358,7 @@ def _set_mixture_composition(
     components : List[Component]
         List of Component objects, each with name, formula, and state attributes.
     component_keys : List[ComponentKey], optional
-        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula'].
+        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula-State'].
     identifier_mode : Literal['normal', 'strict'], optional
         The mode of search for component identifiers. In 'normal' mode, the function will check against multiple identifiers (name-state, formula-state, name-formula, etc.). In 'strict' mode, it will not check Name and Formula. Default is 'normal'.
 
@@ -366,13 +368,8 @@ def _set_mixture_composition(
         Dictionary with component identifiers as keys and their corresponding mole fractions as values.
     """
     try:
-        # set default component_keys if not provided
         if component_keys is None:
-            component_keys = [
-                'Name-State',
-                'Formula-State',
-                'Name-Formula'
-            ]
+            component_keys = _DEFAULT_COMPONENT_KEYS
 
         # NOTE: Initialize result dictionary
         result_dict: Dict[str, float] = {}
@@ -425,7 +422,7 @@ def set_mixture_mole_fraction(
     components : List[Component]
         List of Component objects, each with name, formula, and state attributes.
     component_keys : List[ComponentKey], optional
-        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula'].
+        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula-State'].
     identifier_mode : Literal['normal', 'strict'], optional
         The mode of search for component identifiers. In 'normal' mode, the function will check against multiple identifiers (name-state, formula-state, name-formula, etc.). In 'strict' mode, it will not check Name and Formula. Default is 'normal'.
 
@@ -460,7 +457,7 @@ def set_mixture_mass_fraction(
     components : List[Component]
         List of Component objects, each with name, formula, and state attributes.
     component_keys : List[ComponentKey], optional
-        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula'].
+        List of component keys to use for setting the composition. Default is ['Name-State', 'Formula-State', 'Name-Formula-State'].
     identifier_mode : Literal['normal', 'strict'], optional
         The mode of search for component identifiers. In 'normal' mode, the function will check against multiple identifiers (name-state, formula-state, name-formula, etc.). In 'strict' mode, it will not check Name and Formula. Default is 'normal'.
 
@@ -494,7 +491,7 @@ def set_mixture_volume_fraction(
         Components used to resolve the input identifiers.
     component_keys : List[ComponentKey], optional
         Identifiers to include for each resolved component. Defaults to
-        ['Name-State', 'Formula-State', 'Name-Formula'].
+        ['Name-State', 'Formula-State', 'Name-Formula-State'].
     identifier_mode : Literal['normal', 'strict'], optional
         Component identifier matching mode. Defaults to 'strict'.
 
@@ -528,7 +525,7 @@ def set_mixture_molar_concentration(
         Components used to resolve the input identifiers.
     component_keys : List[ComponentKey], optional
         Identifiers to include for each resolved component. Defaults to
-        ['Name-State', 'Formula-State', 'Name-Formula'].
+        ['Name-State', 'Formula-State', 'Name-Formula-State'].
     identifier_mode : Literal['normal', 'strict'], optional
         Component identifier matching mode. Defaults to 'strict'.
 
@@ -562,7 +559,7 @@ def set_mixture_mass_concentration(
         Components used to resolve the input identifiers.
     component_keys : List[ComponentKey], optional
         Identifiers to include for each resolved component. Defaults to
-        ['Name-State', 'Formula-State', 'Name-Formula'].
+        ['Name-State', 'Formula-State', 'Name-Formula-State'].
     identifier_mode : Literal['normal', 'strict'], optional
         Component identifier matching mode. Defaults to 'strict'.
 
@@ -596,7 +593,7 @@ def set_mixture_molality(
         Components used to resolve the input identifiers.
     component_keys : List[ComponentKey], optional
         Identifiers to include for each resolved component. Defaults to
-        ['Name-State', 'Formula-State', 'Name-Formula'].
+        ['Name-State', 'Formula-State', 'Name-Formula-State'].
     identifier_mode : Literal['normal', 'strict'], optional
         Component identifier matching mode. Defaults to 'strict'.
 
@@ -630,7 +627,7 @@ def set_mixture_partial_pressure(
         Components used to resolve the input identifiers.
     component_keys : List[ComponentKey], optional
         Identifiers to include for each resolved component. Defaults to
-        ['Name-State', 'Formula-State', 'Name-Formula'].
+        ['Name-State', 'Formula-State', 'Name-Formula-State'].
     identifier_mode : Literal['normal', 'strict'], optional
         Component identifier matching mode. Defaults to 'strict'.
 
@@ -664,7 +661,7 @@ def set_mixture_moles(
         Components used to resolve the input identifiers.
     component_keys : List[ComponentKey], optional
         Identifiers to include for each resolved component. Defaults to
-        ['Name-State', 'Formula-State', 'Name-Formula'].
+        ['Name-State', 'Formula-State', 'Name-Formula-State'].
     identifier_mode : Literal['normal', 'strict'], optional
         Component identifier matching mode. Defaults to 'strict'.
 
@@ -698,7 +695,7 @@ def set_mixture_mass(
         Components used to resolve the input identifiers.
     component_keys : List[ComponentKey], optional
         Identifiers to include for each resolved component. Defaults to
-        ['Name-State', 'Formula-State', 'Name-Formula'].
+        ['Name-State', 'Formula-State', 'Name-Formula-State'].
     identifier_mode : Literal['normal', 'strict'], optional
         Component identifier matching mode. Defaults to 'strict'.
 
@@ -732,7 +729,7 @@ def set_mixture_volume(
         Components used to resolve the input identifiers.
     component_keys : List[ComponentKey], optional
         Identifiers to include for each resolved component. Defaults to
-        ['Name-State', 'Formula-State', 'Name-Formula'].
+        ['Name-State', 'Formula-State', 'Name-Formula-State'].
     identifier_mode : Literal['normal', 'strict'], optional
         Component identifier matching mode. Defaults to 'strict'.
 
