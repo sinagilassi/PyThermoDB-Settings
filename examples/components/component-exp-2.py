@@ -11,7 +11,7 @@ comp2 = Component(name="Ethanol", formula="C2H6O", state="l")
 print(comp2)
 
 # NOTE: create a mapper
-mapper = build_component_mapper(comp)
+mapper = build_component_mapper(component=comp)
 print(mapper)
 
 # NOTE: create a components mapper
