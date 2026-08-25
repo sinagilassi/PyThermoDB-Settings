@@ -131,6 +131,7 @@ def set_component_id(
         elif case == 'upper':
             component_id = component_id.upper()
         elif case is None:
+            # ! do nothing
             pass
         else:
             raise ValueError(
@@ -746,6 +747,10 @@ def find_components_by_ids(
     -------
     List[Optional[Component]]
         A list of components with the matching identifiers, or None.
+
+    Notes
+    -----
+    - If `any` of the identifiers do not match any component, the function will return `None`.
     """
     try:
         res: List[Optional[Component]] = [
