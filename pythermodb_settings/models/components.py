@@ -43,17 +43,43 @@ _FORMULA_CHARGE_PATTERN = re.compile(
     r"\{(?:(?P<magnitude>\d+(?:\.\d+)?)(?P<sign>[+-])|(?P<unit_sign>[+-]))\}\s*$"
 )
 
+# SECTION: Charge centers pattern
+_CHARGE_CENTER_PATTERN = re.compile(
+    r"\{(?:(?P<magnitude>\d+)?(?P<sign>[+-]))\}"
+)
+
+
+def _parse_charge_centers(formula: str) -> list[int]:
+    charges: list[int] = []
+
+    for match in _CHARGE_CENTER_PATTERN.finditer(formula):
+        magnitude = match.group("magnitude")
+        sign = match.group("sign")
+
+        value = int(magnitude) if magnitude else 1
+
+        if sign == "-":
+            value = -value
+
+        charges.append(value)
+
+    return charges
+
+
+def _parse_formula_charge(formula: str) -> int:
+    charges = _parse_charge_centers(formula)
+    return sum(charges)
 
 # ! ::: Parsing formula charge
-def _parse_formula_charge(formula: str) -> int | None:
-    match = _FORMULA_CHARGE_PATTERN.search(formula.strip())
-    if match is None:
-        return None
+# def _parse_formula_charge(formula: str) -> int | None:
+#     match = _FORMULA_CHARGE_PATTERN.search(formula.strip())
+#     if match is None:
+#         return None
 
-    sign = match.group("sign") or match.group("unit_sign")
-    magnitude = match.group("magnitude")
-    charge = _coerce_charge_int(magnitude) if magnitude is not None else 1
-    return charge if sign == "+" else -charge
+#     sign = match.group("sign") or match.group("unit_sign")
+#     magnitude = match.group("magnitude")
+#     charge = _coerce_charge_int(magnitude) if magnitude is not None else 1
+#     return charge if sign == "+" else -charge
 
 
 # ! ::: Coerce charge to integer
@@ -110,39 +136,73 @@ _SPECIES_PATTERN = re.compile(
 # ! ::: Parsing species type
 
 
+# def _parse_species_type(formula: str) -> list[SpeciesType]:
+#     match = _SPECIES_PATTERN.search(formula.strip())
+
+#     if match is None:
+#         return ["neutral"]
+
+#     if match.group("zwitterion"):
+#         signs = {
+#             sign.strip()
+#             for sign in match.group("zwitterion").split(",")
+#         }
+
+#         if signs == {"+", "-"}:
+#             return ["zwitterion"]
+
+#         raise ValueError("Invalid zwitterion notation.")
+
+#     if match.group("pure_radical"):
+#         return ["radical"]
+
+#     if match.group("radical"):
+#         if match.group("radical_sign") == "+":
+#             return ["radical", "cation"]
+
+#         return ["radical", "anion"]
+
+#     if match.group("sign") == "+":
+#         return ["cation"]
+
+#     if match.group("sign") == "-":
+#         return ["anion"]
+
+#     return ["neutral"]
+
 def _parse_species_type(formula: str) -> list[SpeciesType]:
-    match = _SPECIES_PATTERN.search(formula.strip())
+    charges = _parse_charge_centers(formula)
 
-    if match is None:
-        return ["neutral"]
+    has_positive = any(charge > 0 for charge in charges)
+    has_negative = any(charge < 0 for charge in charges)
 
-    if match.group("zwitterion"):
-        signs = {
-            sign.strip()
-            for sign in match.group("zwitterion").split(",")
-        }
+    # radical detection
+    has_radical = bool(
+        re.search(r"\{[*•](?:\d*[+-])?\}", formula)
+    )
 
-        if signs == {"+", "-"}:
-            return ["zwitterion"]
+    species: list[SpeciesType] = []
 
-        raise ValueError("Invalid zwitterion notation.")
+    # zwitterion
+    if has_positive and has_negative and sum(charges) == 0:
+        species.append("zwitterion")
 
-    if match.group("pure_radical"):
-        return ["radical"]
+    else:
+        net_charge = sum(charges)
 
-    if match.group("radical"):
-        if match.group("radical_sign") == "+":
-            return ["radical", "cation"]
+        if net_charge > 0:
+            species.append("cation")
 
-        return ["radical", "anion"]
+        elif net_charge < 0:
+            species.append("anion")
 
-    if match.group("sign") == "+":
-        return ["cation"]
+        else:
+            species.append("neutral")
 
-    if match.group("sign") == "-":
-        return ["anion"]
+    if has_radical:
+        species.append("radical")
 
-    return ["neutral"]
+    return species
 
 
 # SECTION: Component model
@@ -221,19 +281,20 @@ class Component(BaseModel):
             return data
 
         formula = data.get("formula")
+
         if not isinstance(formula, str):
             return data
 
         formula_charge = _parse_formula_charge(formula)
-        if formula_charge is None:
-            return data
+
+        data = dict(data)
 
         if "charge" not in data or data.get("charge") is None:
-            data = dict(data)
             data["charge"] = formula_charge
             return data
 
         charge = _coerce_charge_int(data["charge"])
+
         if charge != formula_charge:
             raise ValueError(
                 "Component formula charge and charge field are inconsistent: "
