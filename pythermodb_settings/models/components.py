@@ -4,6 +4,7 @@ from typing import (
     Literal,
     TypeAlias,
     Any,
+    List,
 )
 from pydantic import (
     BaseModel,
@@ -28,12 +29,22 @@ ComponentKey = Literal[
 
 MixtureKey = ComponentKey
 
+# SECTION: Species type
+SpeciesType = Literal[
+    "neutral",
+    "cation",
+    "anion",
+    "radical",
+    "zwitterion",
+]
+
 # SECTION: Component model
 _FORMULA_CHARGE_PATTERN = re.compile(
     r"\{(?:(?P<magnitude>\d+(?:\.\d+)?)(?P<sign>[+-])|(?P<unit_sign>[+-]))\}\s*$"
 )
 
 
+# ! ::: Parsing formula charge
 def _parse_formula_charge(formula: str) -> int | None:
     match = _FORMULA_CHARGE_PATTERN.search(formula.strip())
     if match is None:
@@ -45,6 +56,7 @@ def _parse_formula_charge(formula: str) -> int | None:
     return charge if sign == "+" else -charge
 
 
+# ! ::: Coerce charge to integer
 def _coerce_charge_int(value: Any) -> int:
     if isinstance(value, bool):
         raise ValueError("Charge must be an integer.")
@@ -65,6 +77,75 @@ def _coerce_charge_int(value: Any) -> int:
 
     raise ValueError("Charge must be an integer.")
 
+
+# SECTION: Species pattern for parsing species type
+_SPECIES_PATTERN = re.compile(
+    r"""
+    \{
+        (?:
+            # radical ion
+            (?P<radical>[*•])
+            (?:(?P<radical_magnitude>\d+)?(?P<radical_sign>[+-]))
+
+            |
+
+            # ordinary ion
+            (?:(?P<magnitude>\d+)?(?P<sign>[+-]))
+
+            |
+
+            # pure radical
+            (?P<pure_radical>[*•])
+
+            |
+
+            # zwitterion
+            (?P<zwitterion>[+-]\s*,\s*[+-])
+        )
+    \}
+    \s*$
+    """,
+    re.VERBOSE,
+)
+# ! ::: Parsing species type
+
+
+def _parse_species_type(formula: str) -> list[SpeciesType]:
+    match = _SPECIES_PATTERN.search(formula.strip())
+
+    if match is None:
+        return ["neutral"]
+
+    if match.group("zwitterion"):
+        signs = {
+            sign.strip()
+            for sign in match.group("zwitterion").split(",")
+        }
+
+        if signs == {"+", "-"}:
+            return ["zwitterion"]
+
+        raise ValueError("Invalid zwitterion notation.")
+
+    if match.group("pure_radical"):
+        return ["radical"]
+
+    if match.group("radical"):
+        if match.group("radical_sign") == "+":
+            return ["radical", "cation"]
+
+        return ["radical", "anion"]
+
+    if match.group("sign") == "+":
+        return ["cation"]
+
+    if match.group("sign") == "-":
+        return ["anion"]
+
+    return ["neutral"]
+
+
+# SECTION: Component model
 
 class Component(BaseModel):
     """
@@ -95,6 +176,10 @@ class Component(BaseModel):
         default=0,
         description="Charge of the component, if applicable"
     )
+    species_type: List[SpeciesType] = Field(
+        default_factory=lambda: ["neutral"],
+        description="Species classification derived from the chemical formula"
+    )
     mole_fraction: float = Field(
         default=0,
         description="Mole fraction of the component in a mixture, if applicable"
@@ -105,11 +190,30 @@ class Component(BaseModel):
         description="Custom properties for the component must include 'name', 'value', 'unit', 'symbol"
     )
 
+    # ! ::: Validators for the Component model
     @field_validator("charge", mode="before")
     @classmethod
     def validate_charge(cls, value: Any) -> int:
         return _coerce_charge_int(value)
 
+    # ! ::: Set species type from chemical formula before model validation
+    @model_validator(mode="before")
+    @classmethod
+    def set_species_type_from_formula(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+
+        formula = data.get("formula")
+
+        if not isinstance(formula, str):
+            return data
+
+        data = dict(data)
+        data["species_type"] = _parse_species_type(formula)
+
+        return data
+
+    # ! ::: Set charge from chemical formula before model validation
     @model_validator(mode="before")
     @classmethod
     def set_charge_from_formula(cls, data: Any) -> Any:

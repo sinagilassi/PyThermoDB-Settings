@@ -44,3 +44,23 @@ print(comp_10)
 
 comp_11 = Component(name="Proton", formula="H{+}", state="s")
 print(comp_11)
+
+# radical species
+comp_12 = Component(name="Methyl radical", formula="CH3{*}", state="s")
+print(comp_12)
+
+# radical cation
+comp_13 = Component(name="Methyl radical cation", formula="CH3{*+}", state="s")
+print(comp_13)
+
+# radical anion
+comp_14 = Component(name="Methyl radical anion", formula="CH3{*-}", state="s")
+print(comp_14)
+
+# zwitterion
+comp_15 = Component(
+    name="Glycine zwitterion",
+    formula="NH3{+}-CH2-COO{-}",
+    state="s"
+)
+print(comp_15)
