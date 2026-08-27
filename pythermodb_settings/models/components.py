@@ -38,15 +38,12 @@ SpeciesType = Literal[
     "zwitterion",
 ]
 
-# SECTION: Component model
-_FORMULA_CHARGE_PATTERN = re.compile(
-    r"\{(?:(?P<magnitude>\d+(?:\.\d+)?)(?P<sign>[+-])|(?P<unit_sign>[+-]))\}\s*$"
-)
-
 # SECTION: Charge centers pattern
 _CHARGE_CENTER_PATTERN = re.compile(
-    r"\{(?:(?P<magnitude>\d+)?(?P<sign>[+-]))\}"
+    r"\{(?:\*)?(?P<magnitude>\d+)?(?P<sign>[+-])\}"
 )
+
+# ! ::: Parsing formula charge
 
 
 def _parse_charge_centers(formula: str) -> list[int]:
@@ -70,19 +67,9 @@ def _parse_formula_charge(formula: str) -> int:
     charges = _parse_charge_centers(formula)
     return sum(charges)
 
-# ! ::: Parsing formula charge
-# def _parse_formula_charge(formula: str) -> int | None:
-#     match = _FORMULA_CHARGE_PATTERN.search(formula.strip())
-#     if match is None:
-#         return None
-
-#     sign = match.group("sign") or match.group("unit_sign")
-#     magnitude = match.group("magnitude")
-#     charge = _coerce_charge_int(magnitude) if magnitude is not None else 1
-#     return charge if sign == "+" else -charge
-
-
 # ! ::: Coerce charge to integer
+
+
 def _coerce_charge_int(value: Any) -> int:
     if isinstance(value, bool):
         raise ValueError("Charge must be an integer.")
@@ -103,72 +90,8 @@ def _coerce_charge_int(value: Any) -> int:
 
     raise ValueError("Charge must be an integer.")
 
-
-# SECTION: Species pattern for parsing species type
-_SPECIES_PATTERN = re.compile(
-    r"""
-    \{
-        (?:
-            # radical ion
-            (?P<radical>[*•])
-            (?:(?P<radical_magnitude>\d+)?(?P<radical_sign>[+-]))
-
-            |
-
-            # ordinary ion
-            (?:(?P<magnitude>\d+)?(?P<sign>[+-]))
-
-            |
-
-            # pure radical
-            (?P<pure_radical>[*•])
-
-            |
-
-            # zwitterion
-            (?P<zwitterion>[+-]\s*,\s*[+-])
-        )
-    \}
-    \s*$
-    """,
-    re.VERBOSE,
-)
 # ! ::: Parsing species type
 
-
-# def _parse_species_type(formula: str) -> list[SpeciesType]:
-#     match = _SPECIES_PATTERN.search(formula.strip())
-
-#     if match is None:
-#         return ["neutral"]
-
-#     if match.group("zwitterion"):
-#         signs = {
-#             sign.strip()
-#             for sign in match.group("zwitterion").split(",")
-#         }
-
-#         if signs == {"+", "-"}:
-#             return ["zwitterion"]
-
-#         raise ValueError("Invalid zwitterion notation.")
-
-#     if match.group("pure_radical"):
-#         return ["radical"]
-
-#     if match.group("radical"):
-#         if match.group("radical_sign") == "+":
-#             return ["radical", "cation"]
-
-#         return ["radical", "anion"]
-
-#     if match.group("sign") == "+":
-#         return ["cation"]
-
-#     if match.group("sign") == "-":
-#         return ["anion"]
-
-#     return ["neutral"]
 
 def _parse_species_type(formula: str) -> list[SpeciesType]:
     charges = _parse_charge_centers(formula)
@@ -178,7 +101,7 @@ def _parse_species_type(formula: str) -> list[SpeciesType]:
 
     # radical detection
     has_radical = bool(
-        re.search(r"\{[*•](?:\d*[+-])?\}", formula)
+        re.search(r"\{\*(?:\d*[+-])?\}", formula)
     )
 
     species: list[SpeciesType] = []
