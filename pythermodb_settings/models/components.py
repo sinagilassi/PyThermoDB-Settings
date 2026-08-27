@@ -17,7 +17,7 @@ from pydantic import (
 
 
 # SECTION: Component key type
-ComponentKey = Literal[
+ComponentKey: TypeAlias = Literal[
     'Name-State',
     'Formula-State',
     'Name-Formula',
@@ -30,7 +30,7 @@ ComponentKey = Literal[
 MixtureKey = ComponentKey
 
 # SECTION: Species type
-SpeciesType = Literal[
+SpeciesType: TypeAlias = Literal[
     "neutral",
     "cation",
     "anion",

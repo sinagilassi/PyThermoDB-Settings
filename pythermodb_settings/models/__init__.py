@@ -6,6 +6,7 @@ from .components import (
     MixtureIdentity,
     ComponentKey,
     MixtureKey,
+    SpeciesType,
 
 )
 from .compositions import (
@@ -56,6 +57,7 @@ __all__ = [
     "MixtureIdentity",
     "ComponentKey",
     "MixtureKey",
+    "SpeciesType",
     "Temperature",
     "Pressure",
     "Volume",
@@ -87,4 +89,6 @@ __all__ = [
     "MixtureMolality",
     "MixturePartialPressure",
     "MixtureMoles",
+    "MixtureMass",
+    "MixtureVolume"
 ]
