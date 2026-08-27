@@ -149,6 +149,11 @@ class Component(BaseModel):
     X: dict, optional
         Custom properties for the component. Must include 'name', 'value', 'unit', and 'symbol'. Default is an empty dictionary.
     """
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="allow"
+    )
+
     name: str = Field(..., description="Name of the component")
     formula: str = Field(..., description="Chemical formula of the component")
     state: Literal['g', 'l', 's', 'aq'] = Field(
@@ -226,13 +231,320 @@ class Component(BaseModel):
 
         return data
 
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        extra="allow"
-    )
+    def has_species_type(self, species_type: SpeciesType) -> bool:
+        """Return whether the component has the given species classification."""
+        return species_type in self.species_type
 
+    # ! check neutrality
+    def is_neutral(self) -> bool:
+        return self.has_species_type("neutral")
+
+    # ! check cation
+    def is_cation(self) -> bool:
+        return self.has_species_type("cation")
+
+    # ! check anion
+    def is_anion(self) -> bool:
+        return self.has_species_type("anion")
+
+    # ! check radical
+    def is_radical(self) -> bool:
+        return self.has_species_type("radical")
+
+    # ! check zwitterion
+    def is_zwitterion(self) -> bool:
+        return self.has_species_type("zwitterion")
+
+    # ! check ionic
+    def is_ionic(self) -> bool:
+        """
+        Return True if the species has ionic character.
+
+        Includes:
+        - cations
+        - anions
+        - zwitterions
+        """
+        return (
+            self.is_cation()
+            or self.is_anion()
+            or self.is_zwitterion()
+        )
+
+    # ! ::: Charge helpers
+
+    def get_charge_centers(self) -> list[int]:
+        """
+        Return all explicit local charge centers encoded in the formula.
+
+        Examples
+        --------
+        Na{+}                  -> [1]
+        SO4{2-}                -> [-2]
+        NH3{+}-CH2-COO{-}      -> [1, -1]
+        """
+        return _parse_charge_centers(self.formula)
+
+    def get_net_charge(self) -> int:
+        """
+        Return the net charge of the component.
+        """
+        return self.charge
+
+    def has_charge_centers(self) -> bool:
+        """
+        Return True if the formula contains one or more explicit charge centers.
+        """
+        return bool(self.get_charge_centers())
+
+    def has_internal_charges(self) -> bool:
+        """
+        Return True if the species contains explicit local charge centers.
+
+        This is especially useful for zwitterions, whose net charge is zero
+        but which contain positive and negative charge centers.
+        """
+        return self.has_charge_centers()
+
+    def get_charge_center_count(self) -> int:
+        """
+        Return the total number of explicit charge centers.
+        """
+        return len(self.get_charge_centers())
+
+    def get_positive_charge_count(self) -> int:
+        """
+        Return the number of positive charge centers.
+        """
+        return sum(
+            charge > 0
+            for charge in self.get_charge_centers()
+        )
+
+    def get_negative_charge_count(self) -> int:
+        """
+        Return the number of negative charge centers.
+        """
+        return sum(
+            charge < 0
+            for charge in self.get_charge_centers()
+        )
+
+    def get_total_positive_charge(self) -> int:
+        """
+        Return the sum of all positive local charges.
+
+        Example
+        -------
+        X{2+}-Y{+} -> 3
+        """
+        return sum(
+            charge
+            for charge in self.get_charge_centers()
+            if charge > 0
+        )
+
+    def get_total_negative_charge(self) -> int:
+        """
+        Return the sum of all negative local charges.
+
+        Example
+        -------
+        X{2-}-Y{-} -> -3
+        """
+        return sum(
+            charge
+            for charge in self.get_charge_centers()
+            if charge < 0
+        )
+
+    def is_charged(self) -> bool:
+        """
+        Return True if the component has a non-zero net charge.
+        """
+        return self.charge != 0
+
+    # ! ::: Radical helpers
+
+    def get_radical_count(self) -> int:
+        """
+        Return the number of radical annotations in the formula.
+
+        Examples
+        --------
+        OH{*}       -> 1
+        O2{*-}      -> 1
+        """
+        return len(
+            re.findall(
+                r"\{\*(?:\d*[+-])?\}",
+                self.formula
+            )
+        )
+
+    def has_radical_centers(self) -> bool:
+        """
+        Return True if the formula contains at least one radical marker.
+        """
+        return self.get_radical_count() > 0
+
+    def is_radical_ion(self) -> bool:
+        """
+        Return True if the component is both radical and electrically charged.
+        """
+        return self.is_radical() and self.is_charged()
+
+    # ! ::: Phase helpers
+
+    def is_gas(self) -> bool:
+        """
+        Return True if the component is in the gas phase.
+        """
+        return self.state == "g"
+
+    def is_liquid(self) -> bool:
+        """
+        Return True if the component is in the liquid phase.
+        """
+        return self.state == "l"
+
+    def is_solid(self) -> bool:
+        """
+        Return True if the component is in the solid phase.
+        """
+        return self.state == "s"
+
+    def is_aqueous(self) -> bool:
+        """
+        Return True if the component is in the aqueous phase.
+        """
+        return self.state == "aq"
+
+    # ! ::: Formula helpers
+
+    def get_base_formula(self) -> str:
+        """
+        Return the formula with charge and radical annotations removed.
+
+        Examples
+        --------
+        Na{+}                  -> Na
+        SO4{2-}                -> SO4
+        OH{*}                  -> OH
+        O2{*-}                 -> O2
+        NH3{+}-CH2-COO{-}      -> NH3-CH2-COO
+        """
+
+        formula = self.formula
+
+        # remove charged radical annotations such as {*+}, {*-}, {*2+}
+        formula = re.sub(
+            r"\{\*\d*[+-]\}",
+            "",
+            formula
+        )
+
+        # remove pure radical annotation {*}
+        formula = re.sub(
+            r"\{\*\}",
+            "",
+            formula
+        )
+
+        # remove charge annotations such as {+}, {-}, {2+}, {3-}
+        formula = re.sub(
+            r"\{\d*[+-]\}",
+            "",
+            formula
+        )
+
+        return formula
+
+    def has_annotations(self) -> bool:
+        """
+        Return True if the formula contains charge or radical annotations.
+        """
+        return bool(
+            re.search(
+                r"\{[^{}]+\}",
+                self.formula
+            )
+        )
+
+    # ! ::: Identity helpers
+
+    def get_name_state(self) -> str:
+        """
+        Return the Name-State identifier.
+
+        Example
+        -------
+        sulfate + aq -> sulfate-aq
+        """
+        return f"{self.name}-{self.state}"
+
+    def get_formula_state(self) -> str:
+        """
+        Return the Formula-State identifier.
+
+        Example
+        -------
+        SO4{2-} + aq -> SO4{2-}-aq
+        """
+        return f"{self.formula}-{self.state}"
+
+    def get_name_formula(self) -> str:
+        """
+        Return the Name-Formula identifier.
+
+        Example
+        -------
+        sulfate + SO4{2-} -> sulfate-SO4{2-}
+        """
+        return f"{self.name}-{self.formula}"
+
+    def get_name_formula_state(self) -> str:
+        """
+        Return the Name-Formula-State identifier.
+        """
+        return f"{self.name}-{self.formula}-{self.state}"
+
+    def get_formula_name_state(self) -> str:
+        """
+        Return the Formula-Name-State identifier.
+        """
+        return f"{self.formula}-{self.name}-{self.state}"
+
+    def get_key(self, key: ComponentKey) -> str:
+        """
+        Build a component identifier according to the requested key format.
+        """
+
+        mapping = {
+            "Name-State": self.get_name_state,
+            "Formula-State": self.get_formula_state,
+            "Name-Formula": self.get_name_formula,
+            "Name": lambda: self.name,
+            "Formula": lambda: self.formula,
+            "Name-Formula-State": self.get_name_formula_state,
+            "Formula-Name-State": self.get_formula_name_state,
+        }
+
+        return mapping[key]()
+
+    def get_identity(self) -> "ComponentIdentity":
+        """
+        Build and return the ComponentIdentity representation.
+        """
+        return ComponentIdentity(
+            name_state=self.get_name_state(),
+            formula_state=self.get_formula_state(),
+            name_formula=self.get_name_formula(),
+        )
 
 # SECTION: Component identity model
+
+
 class ComponentIdentity(BaseModel):
     """
     Model for component identity.
