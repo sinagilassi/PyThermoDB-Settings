@@ -1,5 +1,5 @@
 # import libs
-from pythermodb_settings.models import Component
+from pythermodb_settings.models import Component, ComponentState
 from rich import print
 
 # NOTE: create a component
