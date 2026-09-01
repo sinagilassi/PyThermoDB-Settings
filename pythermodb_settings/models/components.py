@@ -14,7 +14,7 @@ from pydantic import (
     model_validator,
 )
 # locals
-
+from .refs import ComponentState
 
 # SECTION: Component key type
 ComponentKey: TypeAlias = Literal[
@@ -140,7 +140,7 @@ class Component(BaseModel):
         Name of the component.
     formula : str
         Chemical formula of the component.
-    state : Literal['g', 'l', 's', 'aq']
+    state : ComponentState
         State of the component: 'g' for gas, 'l' for liquid, 's' for solid, 'aq' for aqueous.
     charge : int, optional
         Charge of the component, if applicable. Default is 0.
@@ -156,7 +156,7 @@ class Component(BaseModel):
 
     name: str = Field(..., description="Name of the component")
     formula: str = Field(..., description="Chemical formula of the component")
-    state: Literal['g', 'l', 's', 'aq'] = Field(
+    state: ComponentState = Field(
         ...,
         description="State of the component: 'g' for gas, 'l' for liquid, 's' for solid, 'aq' for aqueous"
     )
