@@ -1,4 +1,5 @@
 # export
+from .refs import ComponentState
 from .components import (
     Component,
     ComponentIdentity,
@@ -51,6 +52,7 @@ from .constants import CustomConstant
 
 __all__ = [
     "COMPOSITION_METADATA",
+    "ComponentState",
     "Component",
     "ComponentIdentity",
     "Mixture",
