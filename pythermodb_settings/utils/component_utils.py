@@ -1,6 +1,6 @@
 # import libs
 import logging
-from typing import Literal, List, Optional, Dict, TypeGuard, cast, get_args, Any
+from typing import Literal, List, Optional, Dict, TypeGuard, cast, get_args, Any, Tuple
 # local
 from ..models import (
     Component,
@@ -10,6 +10,7 @@ from ..models import (
     MixtureIdentity,
     MixtureKey
 )
+from .tools import measure_time
 
 # NOTE: logger
 logger = logging.getLogger(__name__)
@@ -318,6 +319,7 @@ def create_mixture_id(
         raise
 
 
+# ! ::: Set Component State
 def set_component_state(
         component: Component,
         state: Literal['g', 'l', 's', 'aq'],
@@ -770,3 +772,111 @@ def find_components_by_ids(
     except Exception as e:
         logger.error(f"Error in find_components_by_ids: {e}")
         raise
+
+# ! ::: Configure Component Values by order and component key
+
+
+def config_components_values(
+        values: Dict[str, Any],
+        components: List[Component],
+        component_key: Optional[ComponentKey],
+        case_sensitive: bool = True,
+        sort_by_components_order: bool = True,
+) -> Optional[Tuple[Dict[str, Any], List[Any]]]:
+    """
+    Configure values for multiple components based on their identifiers in the component list and an optional component key.
+
+    Parameters
+    ----------
+    values : Dict[str, float | int]
+        A dictionary of component IDs and their corresponding values.
+    components : List[Component]
+        A list of Component objects.
+    component_key : Optional[ComponentKey], optional
+        The key to use for identifying components. Defaults to None.
+    case_sensitive : bool, optional
+        Whether the component IDs are case-sensitive. Defaults to True.
+    sort_by_components_order : bool, optional
+        Whether to sort the configured values by the order of components in the component list. Defaults to True.
+
+    Returns
+    -------
+    Optional[Tuple[Dict[str, Any], List[Any]]]
+        A tuple containing:
+        - A dictionary mapping component identifiers (after applying the component key, if any) to their configured values.
+        - A list of the configured values.
+        Returns None if the configuration failed.
+
+    Notes
+    -----
+    - If any identifier does not match any component, it will cause the function to return None.
+    """
+    # SECTION: validate input
+    if not values:
+        logger.warning("No values provided")
+        return None
+
+    # components
+    if not components:
+        logger.warning("No components provided")
+        return None
+
+    # SECTION: get components values
+    # component values
+    component_values: Dict[str, Any] = {}
+
+    for comp_id, comp_val in values.items():
+        # >>> find component by id
+        component_found_ = find_component_by_id(
+            id=comp_id,
+            components=components,
+            case_sensitive=case_sensitive
+        )
+        # >> check
+        if not component_found_:
+            logger.warning("Component not found for id: %s", comp_id)
+            return None
+
+        # NOTE: find index
+        component_index_ = components.index(component_found_)
+
+        # Determine output ID
+        output_id = comp_id
+
+        # NOTE: choose a new id
+        if component_key:
+            output_id = set_component_id(
+                component=component_found_,
+                component_key=component_key
+            )
+
+        if output_id in component_values:
+            logger.warning(
+                "Duplicate component ID after conversion: %s",
+                output_id
+            )
+            return None
+
+        # update component values with new id
+        component_values[output_id] = {
+            "value": comp_val,
+            "index": component_index_,
+        }
+
+    # SECTION: reorder component values
+    if sort_by_components_order is True:
+        component_values = dict(
+            sorted(component_values.items(), key=lambda item: item[1]["index"])
+        )
+
+    # NOTE: remove index from component values
+    for comp_id in component_values:
+        # index
+        component_values[comp_id].pop("index", None)
+        # value
+        component_values[comp_id] = component_values[comp_id]["value"]
+
+    # NOTE: list
+    component_values_list = list(component_values.values())
+
+    return component_values, component_values_list
