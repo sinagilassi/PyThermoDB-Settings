@@ -13,6 +13,7 @@ from .component_utils import (
     generate_mixture_references,
     find_component_by_id,
     find_components_by_ids,
+    config_components_values,
 )
 
 # tools
@@ -54,6 +55,7 @@ __all__ = [
     "generate_mixture_references",
     "find_component_by_id",
     "find_components_by_ids",
+    "config_components_values",
     "component_composition",
     "set_component_composition",
     "set_mixture_mole_fraction",
