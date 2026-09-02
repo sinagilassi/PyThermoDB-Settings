@@ -39,9 +39,10 @@ from .opt_tools import (
 )
 
 # quantity tools
-from .quantity_tools import (
+from .quantity_main import (
     to_custom_props_mapping,
     to_amounts,
+    to_amounts_by_order,
 )
 
 # all
@@ -74,4 +75,7 @@ __all__ = [
     "set_mixture_moles",
     "set_mixture_mass",
     "set_mixture_volume",
+    "to_custom_props_mapping",
+    "to_amounts",
+    "to_amounts_by_order",
 ]
