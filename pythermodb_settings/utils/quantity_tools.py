@@ -91,26 +91,3 @@ def to_custom_props_mapping(
             converted_values[key] = float(value)
 
     return converted_values
-
-
-# ! ::: Convert component amounts to the requested output unit
-def to_amounts(
-        component_amounts: ComponentAmounts,
-        output_unit: Optional[str] = None
-) -> Dict[str, float]:
-    """
-    Convert a dictionary of component amounts to float values.
-
-    Parameters
-    ----------
-    component_amounts : ComponentAmounts
-        A dictionary mapping component names to amounts. Numeric values are assumed to already be in output_unit.
-    output_unit : str, optional
-        The unit to which CustomProp component amounts should be converted. Default is None.
-
-    Returns
-    -------
-    Dict[str, float]
-        A dictionary mapping component names to their respective amounts as floats.
-    """
-    return to_custom_props_mapping(component_amounts, output_unit)
