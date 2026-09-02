@@ -182,7 +182,7 @@ class MixtureComposition(BaseModel):
     )
 
 
-# SECTION: Fraction Model
+# SECTION: Mixture Composition Models
 # NOTE: mole fraction
 MixtureMoleFraction: TypeAlias = Dict[str, float]
 
