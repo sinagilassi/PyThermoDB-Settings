@@ -49,6 +49,7 @@ from .references import (
 from .rules import ComponentRule
 from .source import ComponentThermoDBSource, MixtureThermoDBSource
 from .constants import CustomConstant
+from .units import UnitConversionFn
 
 __all__ = [
     "COMPOSITION_METADATA",
@@ -92,5 +93,6 @@ __all__ = [
     "MixturePartialPressure",
     "MixtureMoles",
     "MixtureMass",
-    "MixtureVolume"
+    "MixtureVolume",
+    "UnitConversionFn"
 ]

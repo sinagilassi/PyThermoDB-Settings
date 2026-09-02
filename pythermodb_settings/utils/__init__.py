@@ -38,6 +38,12 @@ from .opt_tools import (
     set_mixture_volume,
 )
 
+# quantity tools
+from .quantity_tools import (
+    to_custom_props_mapping,
+    to_amounts,
+)
+
 # all
 __all__ = [
     "create_component_id",
