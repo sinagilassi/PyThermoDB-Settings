@@ -91,3 +91,26 @@ def to_custom_props_mapping(
             converted_values[key] = float(value)
 
     return converted_values
+
+
+# ! ::: Convert a CustomProp scalar to the requested output unit
+def to_custom_prop_scalar(
+        prop: CustomProp,
+        output_unit: Optional[str] = None,
+        unit_conversion_fn: Optional[UnitConversionFn] = None,
+) -> float:
+    val_ = prop.value
+    unit_ = prop.unit
+
+    if (
+        output_unit and
+        unit_conversion_fn is not None and
+        not _same_unit(unit_, output_unit)
+    ):
+        val_ = unit_conversion_fn(
+            value=val_,
+            from_unit=unit_,
+            to_unit=output_unit
+        )
+
+    return float(val_)
