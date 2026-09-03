@@ -54,6 +54,7 @@ from .validators import (
     non_negative,
     positive,
     fractions,
+    same_shape,
 )
 
 # all
@@ -95,5 +96,6 @@ __all__ = [
     "non_empty",
     "non_negative",
     "positive",
-    "fractions"
+    "fractions",
+    "same_shape"
 ]

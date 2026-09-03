@@ -9,6 +9,29 @@ from .quantity import to_dict, to_list
 logger = logging.getLogger(__name__)
 
 # SECTION: Component Value Validators
+
+# ! :::Check if two component collections have the same shape
+
+
+def same_shape(a: ComponentValues, b: ComponentValues) -> None:
+    """Validate that two component collections can be paired component-wise."""
+    # SECTION: Mapping validation
+    if isinstance(a, Mapping):
+        if not isinstance(b, Mapping):
+            raise TypeError(
+                "Both component inputs must be mappings or both sequences.")
+        if set(a) != set(b):
+            raise ValueError(
+                "Input mappings must have the same component keys.")
+        return
+
+    # SECTION: Sequence validation
+    if isinstance(b, Mapping):
+        raise TypeError(
+            "Both component inputs must be mappings or both sequences.")
+    if len(a) != len(b):
+        raise ValueError("Input sequences must have the same length.")
+
 # ! ::: Check non empty component collections
 
 
