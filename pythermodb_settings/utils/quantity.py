@@ -7,7 +7,7 @@ from ..models.components import Component, ComponentKey
 from ..models.quantities import ComponentAmounts, ScalarValue, ComponentValues
 from ..models.conditions import CustomProp
 from ..models.units import UnitConversionFn
-from .quantity_tools import to_custom_props_mapping
+from .quantity_tools import to_custom_props_mapping, to_custom_prop_scalar
 from .component_utils import config_components_values
 
 # NOTE: logger
@@ -262,3 +262,15 @@ def pos(
     if value <= 0.0:
         raise ValueError(f"{name} must be greater than zero.")
     return value
+
+
+__all__ = [
+    "to_amounts",
+    "to_amounts_by_order",
+    "to_scalar",
+    "to_list",
+    "to_dict",
+    "pos",
+    "to_custom_props_mapping",
+    "to_custom_prop_scalar",
+]
