@@ -2,8 +2,9 @@
 from pydantic import (
     BaseModel,
     Field,
-    ConfigDict
+    ConfigDict,
 )
+from typing import TypeAlias
 
 
 class Temperature(BaseModel):
@@ -138,3 +139,7 @@ class CustomProperty(BaseModel):
         arbitrary_types_allowed=True,
         extra="allow"
     )
+
+
+# SECTION: Type aliases
+ScalarValue: TypeAlias = float | int | CustomProp
