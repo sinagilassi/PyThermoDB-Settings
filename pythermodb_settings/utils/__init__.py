@@ -14,6 +14,7 @@ from .component_utils import (
     find_component_by_id,
     find_components_by_ids,
     config_components_values,
+    extract_component_values,
 )
 
 # tools
@@ -75,6 +76,7 @@ __all__ = [
     "find_component_by_id",
     "find_components_by_ids",
     "config_components_values",
+    "extract_component_values",
     "component_composition",
     "set_component_composition",
     "set_mixture_mole_fraction",
@@ -99,3 +101,4 @@ __all__ = [
     "fractions",
     "same_shape"
 ]
+
