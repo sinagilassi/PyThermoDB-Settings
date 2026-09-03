@@ -36,7 +36,8 @@ from .conditions import (
     Pressure,
     Volume,
     CustomProp,
-    CustomProperty
+    CustomProperty,
+    ScalarValue
 )
 from .configs import ComponentConfig
 from .references import (
@@ -50,7 +51,12 @@ from .rules import ComponentRule
 from .source import ComponentThermoDBSource, MixtureThermoDBSource
 from .constants import CustomConstant
 from .units import UnitConversionFn
-from .quantities import ComponentAmounts, ComponentMoles, ComponentMasses, ComponentVolumes
+from .quantities import (
+    ComponentAmounts,
+    ComponentMoles,
+    ComponentMasses,
+    ComponentVolumes
+)
 
 __all__ = [
     "COMPOSITION_METADATA",
@@ -67,6 +73,7 @@ __all__ = [
     "Volume",
     "CustomProp",
     "CustomProperty",
+    "ScalarValue",
     "ComponentConfig",
     "ReferenceThermoDB",
     "ComponentReferenceThermoDB",
