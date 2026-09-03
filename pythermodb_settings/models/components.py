@@ -302,6 +302,57 @@ class Component(BaseModel):
         """
         return self.get_attribute_method(attribute_name)()
 
+    @classmethod
+    def summary_attributes(cls) -> dict[str, str]:
+        """
+        Return supported component attribute keys and descriptions.
+
+        The returned keys are valid inputs for ``get_attribute_value`` and
+        ``extract_component_values`` when the relevant helper method does not
+        require extra arguments.
+        """
+        field_attributes = {
+            field_name: field.description or "Component model field."
+            for field_name, field in cls.model_fields.items()
+        }
+
+        helper_attributes = {
+            "neutral": "True if the component is classified as neutral.",
+            "cation": "True if the component is classified as a cation.",
+            "anion": "True if the component is classified as an anion.",
+            "radical": "True if the component is classified as a radical.",
+            "zwitterion": "True if the component is classified as a zwitterion.",
+            "ionic": "True if the component has ionic character.",
+            "charge_centers": "List of explicit local charge centers in the formula.",
+            "net_charge": "Net charge of the component.",
+            "charge_center_count": "Number of explicit local charge centers.",
+            "positive_charge_count": "Number of positive charge centers.",
+            "negative_charge_count": "Number of negative charge centers.",
+            "total_positive_charge": "Sum of all positive local charges.",
+            "total_negative_charge": "Sum of all negative local charges.",
+            "charged": "True if the component has a non-zero net charge.",
+            "radical_count": "Number of radical annotations in the formula.",
+            "radical_centers": "True if the formula has at least one radical marker.",
+            "radical_ion": "True if the component is both radical and charged.",
+            "gas": "True if the component is in the gas phase.",
+            "liquid": "True if the component is in the liquid phase.",
+            "solid": "True if the component is in the solid phase.",
+            "aqueous": "True if the component is in the aqueous phase.",
+            "base_formula": "Formula with charge and radical annotations removed.",
+            "annotations": "True if the formula contains charge or radical annotations.",
+            "name_state": "Name-State component identifier.",
+            "formula_state": "Formula-State component identifier.",
+            "name_formula": "Name-Formula component identifier.",
+            "name_formula_state": "Name-Formula-State component identifier.",
+            "formula_name_state": "Formula-Name-State component identifier.",
+            "identity": "ComponentIdentity representation of the component.",
+        }
+
+        return {
+            **field_attributes,
+            **helper_attributes,
+        }
+
     # ! check neutrality
     def is_neutral(self) -> bool:
         return self.has_species_type("neutral")
@@ -670,6 +721,7 @@ class MixtureIdentity(BaseModel):
         ...,
         description="Mixture name-formula identifier"
     )
+
 
 
 
