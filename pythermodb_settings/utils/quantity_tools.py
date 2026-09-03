@@ -1,8 +1,8 @@
 # import libs
-from typing import Dict, List, Mapping, Optional, Protocol
+from collections.abc import Mapping
+from typing import Dict, Optional
 from pythermodb_settings.models import CustomProp
 # locals
-from ..models.quantities import ComponentAmounts
 from ..models.units import UnitConversionFn
 
 
