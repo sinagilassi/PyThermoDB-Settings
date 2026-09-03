@@ -39,10 +39,21 @@ from .opt_tools import (
 )
 
 # quantity tools
-from .quantity_main import (
+from .quantity import (
     to_custom_props_mapping,
     to_amounts,
     to_amounts_by_order,
+    to_scalar,
+    to_dict,
+    to_list,
+)
+
+# validators
+from .validators import (
+    non_empty,
+    non_negative,
+    positive,
+    fractions,
 )
 
 # all
@@ -78,4 +89,11 @@ __all__ = [
     "to_custom_props_mapping",
     "to_amounts",
     "to_amounts_by_order",
+    "to_scalar",
+    "to_dict",
+    "to_list",
+    "non_empty",
+    "non_negative",
+    "positive",
+    "fractions"
 ]
