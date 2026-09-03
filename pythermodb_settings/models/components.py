@@ -1,9 +1,11 @@
 # import libs
 import re
+from inspect import Parameter, signature
 from typing import (
     Literal,
     TypeAlias,
     Any,
+    Callable,
     List,
 )
 from pydantic import (
@@ -234,6 +236,71 @@ class Component(BaseModel):
     def has_species_type(self, species_type: SpeciesType) -> bool:
         """Return whether the component has the given species classification."""
         return species_type in self.species_type
+
+    def get_attribute_method(self, attribute_name: str) -> Callable[[], Any]:
+        """
+        Return a zero-argument method that resolves a component attribute value.
+
+        The resolver supports direct model attributes and zero-argument helper
+        methods. For convenience, attribute names may omit common helper
+        prefixes such as ``get_``, ``is_``, or ``has_``.
+        """
+        if not isinstance(attribute_name, str):
+            raise TypeError("attribute_name must be a string.")
+
+        attribute_name = attribute_name.strip()
+
+        if not attribute_name:
+            raise ValueError("attribute_name cannot be empty.")
+
+        candidate_methods = [
+            attribute_name,
+            f"get_{attribute_name}",
+            f"is_{attribute_name}",
+            f"has_{attribute_name}",
+        ]
+
+        for method_name in candidate_methods:
+            method = getattr(self, method_name, None)
+
+            if not callable(method):
+                continue
+
+            method_signature = signature(method)
+            required_parameters = [
+                parameter
+                for parameter in method_signature.parameters.values()
+                if parameter.default is Parameter.empty
+                and parameter.kind in (
+                    Parameter.POSITIONAL_ONLY,
+                    Parameter.POSITIONAL_OR_KEYWORD,
+                    Parameter.KEYWORD_ONLY,
+                )
+            ]
+
+            if not required_parameters:
+                return method
+
+        if (
+            attribute_name in self.__class__.model_fields
+            or (
+                self.model_extra is not None
+                and attribute_name in self.model_extra
+            )
+            or hasattr(self, attribute_name)
+        ):
+            return lambda: getattr(self, attribute_name)
+
+        raise AttributeError(
+            f"Component has no attribute or zero-argument helper for "
+            f"'{attribute_name}'."
+        )
+
+    def get_attribute_value(self, attribute_name: str) -> Any:
+        """
+        Return a component attribute value by resolving and calling its method.
+        """
+        return self.get_attribute_method(attribute_name)()
 
     # ! check neutrality
     def is_neutral(self) -> bool:
@@ -603,3 +670,6 @@ class MixtureIdentity(BaseModel):
         ...,
         description="Mixture name-formula identifier"
     )
+
+
+
