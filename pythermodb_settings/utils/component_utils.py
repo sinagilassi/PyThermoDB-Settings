@@ -473,6 +473,73 @@ def is_component_key(value: str) -> TypeGuard[ComponentKey]:
     return value.strip() in _VALID_COMPONENT_KEYS
 
 
+def find_component_key_by_id(
+        id: str,
+        components: List[Component],
+        case_sensitive: bool = True,
+        mode: Literal['normal', 'strict'] = 'normal'
+) -> Optional[ComponentKey]:
+    """
+    Find the exact component key that matches a component identifier.
+
+    Parameters
+    ----------
+    id : str
+        The identifier of the component to match.
+    components : List[Component]
+        The list of components to search.
+    case_sensitive : bool, optional
+        Whether the search should be case-sensitive. Default is True.
+    mode : Literal['normal', 'strict'], optional
+        The mode of search. In 'normal' mode, the function will check all
+        component keys. In 'strict' mode, it will not check Name and Formula.
+
+    Returns
+    -------
+    Optional[ComponentKey]
+        The component key that generated the matching identifier, or None if
+        no component/key combination matches.
+    """
+    # NOTE: normalize input identifier before comparing it with generated IDs.
+    component_id = id.strip()
+
+    # NOTE: check if case_sensitive is False, if so convert id to lower case
+    if not case_sensitive:
+        case = 'lower'
+        component_id = component_id.lower()
+    else:
+        case = None
+
+    component_keys: List[ComponentKey] = [
+        'Name-State',
+        'Formula-State',
+        'Name-Formula',
+        'Name-Formula-State',
+        'Formula-Name-State',
+    ]
+
+    if mode == 'normal':
+        component_keys.extend(['Name', 'Formula'])
+    elif mode != 'strict':
+        raise ValueError(
+            f"Invalid mode '{mode}'. Must be 'normal' or 'strict'."
+        )
+
+    # NOTE: iterate through components and return the key that generated id.
+    for component in components:
+        for component_key in component_keys:
+            if (
+                set_component_id(
+                    component,
+                    component_key,
+                    case=case
+                ) == component_id
+            ):
+                return component_key
+
+    return None
+
+
 # SECTION: Component references
 def generate_component_references(
         components: List[Component],

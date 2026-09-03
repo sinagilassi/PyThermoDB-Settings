@@ -1,7 +1,10 @@
 import unittest
 
 from pythermodb_settings.models import Component
-from pythermodb_settings.utils.component_utils import extract_components_values
+from pythermodb_settings.utils.component_utils import (
+    extract_components_values,
+    find_component_key_by_id,
+)
 
 
 class ComponentChargeParsingTest(unittest.TestCase):
@@ -84,6 +87,47 @@ class ComponentChargeParsingTest(unittest.TestCase):
         self.assertEqual(
             attributes["name"],
             "Name of the component",
+        )
+
+    def test_find_component_key_by_id_returns_matching_key(self) -> None:
+        components = [
+            Component(name="Water", formula="H2O", state="l"),
+            Component(name="Ethanol", formula="C2H6O", state="l"),
+        ]
+
+        cases = [
+            ("Water", "Name"),
+            ("H2O", "Formula"),
+            ("Water-l", "Name-State"),
+            ("H2O-l", "Formula-State"),
+            ("Water-H2O", "Name-Formula"),
+            ("Water-H2O-l", "Name-Formula-State"),
+            ("H2O-Water-l", "Formula-Name-State"),
+        ]
+
+        for component_id, expected_key in cases:
+            with self.subTest(component_id=component_id):
+                self.assertEqual(
+                    find_component_key_by_id(component_id, components),
+                    expected_key,
+                )
+
+    def test_find_component_key_by_id_supports_case_and_strict_mode(self) -> None:
+        components = [Component(name="Water", formula="H2O", state="l")]
+
+        self.assertEqual(
+            find_component_key_by_id(
+                "water-l",
+                components,
+                case_sensitive=False,
+            ),
+            "Name-State",
+        )
+        self.assertIsNone(
+            find_component_key_by_id("Water", components, mode="strict")
+        )
+        self.assertIsNone(
+            find_component_key_by_id("Missing", components)
         )
 
     def test_extract_component_values_uses_component_attribute(self) -> None:
