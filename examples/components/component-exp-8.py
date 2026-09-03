@@ -1,4 +1,4 @@
-from pythermodb_settings.utils import extract_component_values
+from pythermodb_settings.utils import extract_components_values
 from pythermodb_settings.models import Component
 import sys
 from pathlib import Path
@@ -49,7 +49,7 @@ print("Water mole fraction:",
 print("Water CAS:", components[1].get_attribute_value("CAS"))
 
 # Extract an attribute from every component and re-key the result.
-mole_fraction_values = extract_component_values(
+mole_fraction_values = extract_components_values(
     attribute_name="mole_fraction",
     components=components,
     component_key="Formula-State",
@@ -65,7 +65,7 @@ print("Mole fractions by Formula-State:", values_by_formula_state)
 print("Mole fractions list:", values_list)
 
 # Helper methods can also be extracted by their short attribute name.
-ionic_values = extract_component_values(
+ionic_values = extract_components_values(
     attribute_name="ionic",
     components=components,
     component_key="Name",
@@ -80,7 +80,7 @@ print("Ionic flags by Name:", values_by_name)
 print("Ionic flags list:", ionic_list)
 
 # Extract net charge
-net_charge_values = extract_component_values(
+net_charge_values = extract_components_values(
     attribute_name="net_charge",
     components=components,
     component_key="Formula-State",
