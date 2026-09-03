@@ -880,3 +880,65 @@ def config_components_values(
     component_values_list = list(component_values.values())
 
     return component_values, component_values_list
+
+# SECTION: Extract Component Values
+
+
+def extract_components_values(
+    attribute_name: str,
+    components: List[Component],
+    component_key: Optional[ComponentKey] = None,
+    case_sensitive: bool = True,
+    sort_by_components_order: bool = True,
+) -> Optional[Tuple[Dict[str, Any], List[Any]]]:
+    """
+    Extract components values for the specified attribute from the list of components.
+
+    Parameters
+    ----------
+    attribute_name : str
+        The name of the attribute in the configuration from which to extract component values.
+    components : List[Component]
+        A list of available components.
+    component_key : Optional[ComponentKey], optional
+        The key to use for generating component identifiers, by default Formula-State.
+    case_sensitive : bool, optional
+        Whether the component identifiers are case-sensitive, by default True.
+    sort_by_components_order : bool, optional
+        Whether to sort the output by the order of components, by default True.
+
+    Returns
+    -------
+    Optional[Tuple[Dict[str, Any], List[Any]]]
+        A tuple containing:
+        - A dictionary mapping component identifiers (after applying the component key, if any) to their configured values.
+        - A list of the configured values.
+        Returns None if the extraction failed.
+    """
+    try:
+        # NOTE: set component key
+        if component_key is None:
+            component_key = "Formula-State"
+
+        values = {
+            set_component_id(
+                component=component,
+                component_key=component_key
+            ): component.get_attribute_value(attribute_name)
+            for component in components
+        }
+    except Exception as e:
+        logger.warning(
+            "Failed to extract component attribute '%s': %s",
+            attribute_name,
+            e
+        )
+        return None
+
+    return config_components_values(
+        values=values,
+        components=components,
+        component_key=component_key,
+        sort_by_components_order=sort_by_components_order,
+        case_sensitive=case_sensitive
+    )
