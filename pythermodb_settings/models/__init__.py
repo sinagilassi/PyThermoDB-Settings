@@ -55,7 +55,8 @@ from .quantities import (
     ComponentAmounts,
     ComponentMoles,
     ComponentMasses,
-    ComponentVolumes
+    ComponentVolumes,
+    ComponentValues,
 )
 
 __all__ = [
@@ -106,5 +107,6 @@ __all__ = [
     "ComponentAmounts",
     "ComponentMoles",
     "ComponentMasses",
-    "ComponentVolumes"
+    "ComponentVolumes",
+    "ComponentValues"
 ]
