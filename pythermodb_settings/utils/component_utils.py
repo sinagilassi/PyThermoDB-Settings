@@ -1,5 +1,6 @@
 # import libs
 import logging
+from collections.abc import Mapping
 from typing import Literal, List, Optional, Dict, TypeGuard, cast, get_args, Any, Tuple
 # local
 from ..models import (
@@ -1009,3 +1010,115 @@ def extract_components_values(
         sort_by_components_order=sort_by_components_order,
         case_sensitive=case_sensitive
     )
+
+# SECTION: Validation Functions
+# ! ::: Check Component Values Keys
+
+
+def extract_component_value_keys(
+        values: Dict[str, Any] | Mapping[str, Any],
+        components: List[Component],
+        case_sensitive: bool = True,
+        mode: Literal['normal', 'strict'] = 'normal'
+) -> Dict[str, ComponentKey] | None:
+    """
+    Check if all component value identifiers are created with the same component key.
+
+    Parameters
+    ----------
+    component_values : Dict[str, Any] | Mapping[str, Any]
+        A dictionary or mapping of component identifiers to their values.
+    components : List[Component]
+        A list of components corresponding to the values.
+    case_sensitive : bool, optional
+        Whether the component identifiers are case-sensitive, by default True.
+    mode : Literal['normal', 'strict'], optional
+        The mode of extraction, by default 'normal'.
+
+    Returns
+    -------
+    Dict[str, ComponentKey]
+        A dictionary mapping component identifiers to their corresponding component keys.
+        Returns None if any component key could not be determined.
+    """
+    if not values:
+        return None
+
+    # SECTION: extract the component id
+    component_ids = list(values.keys())
+
+    # NOTE: all component keys
+    component_keys: Dict[str, ComponentKey] = {}
+
+    # iterate through component ids and find their corresponding component keys
+    for component_id in component_ids:
+        res_ = find_component_key_by_id(
+            id=component_id,
+            components=components,
+            case_sensitive=case_sensitive,
+            mode=mode,
+        )
+
+        # >> check
+        if res_ is None:
+            return None
+        component_keys[component_id] = res_
+
+    return component_keys
+
+
+# ! ::: Set Unique Component Key to Component Values
+def normalize_component_values(
+        values: Dict[str, Any] | Mapping[str, Any],
+        components: List[Component],
+        component_key: ComponentKey,
+        case_sensitive: bool = True,
+        mode: Literal['normal', 'strict'] = 'normal'
+) -> Dict[str, Any] | None:
+    """
+    Set a unique component key to each component value in the provided dictionary of values.
+
+    Parameters
+    ----------
+    values : Dict[str, Any] | Mapping[str, Any]
+        A dictionary or mapping of component identifiers to their values.
+    components : List[Component]
+        A list of components corresponding to the values.
+    component_key : ComponentKey
+        The unique component key to set for each component value.
+    case_sensitive : bool, optional
+        Whether the component identifiers are case-sensitive, by default True.
+    mode : Literal['normal', 'strict'], optional
+        The mode of extraction, by default 'normal'.
+
+    Returns
+    -------
+    Dict[str, Any]
+        A dictionary mapping component identifiers to their corresponding values with the unique component key set.
+        Returns None if any component value could not be updated with the component key.
+    """
+    if not values:
+        return None
+
+    # NOTE: updated values
+    updated_values: Dict[str, Any] = {}
+
+    # SECTION: create new component key
+    for k, v in values.items():
+        # find component
+        component = find_component_by_id(
+            id=k,
+            components=components,
+            case_sensitive=case_sensitive,
+            mode=mode,
+        )
+
+        if component is None:
+            return None
+
+        new_key_ = set_component_id(component, component_key)
+
+        # update the value with the new component key
+        updated_values[new_key_] = v
+
+    return updated_values

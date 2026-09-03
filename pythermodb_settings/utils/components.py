@@ -16,6 +16,8 @@ from .component_utils import (
     find_components_by_ids,
     config_components_values,
     extract_components_values,
+    extract_component_value_keys,
+    normalize_component_values,
 )
 
 __all__ = [
@@ -35,4 +37,6 @@ __all__ = [
     "find_components_by_ids",
     "config_components_values",
     "extract_components_values",
+    "extract_component_value_keys",
+    "normalize_component_values",
 ]
