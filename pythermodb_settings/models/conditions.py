@@ -4,7 +4,7 @@ from pydantic import (
     Field,
     ConfigDict,
 )
-from typing import TypeAlias
+from typing import TypeAlias, Any
 
 
 class Temperature(BaseModel):
