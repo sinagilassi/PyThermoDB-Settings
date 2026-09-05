@@ -1,4 +1,6 @@
 # import libs
+from collections.abc import Mapping
+from typing import Any, Dict
 from pythermodb_settings.utils import config_components_values
 from pythermodb_settings.models import Component
 import sys
@@ -16,11 +18,14 @@ components = [
 ]
 
 # Input keys may use any identifier accepted by find_component_by_id.
-values = {
+values: Dict[str, Any] = {
     "Water-l": 0.70,
     "C2H6O-l": 0.25,
     "Sodium-aq": 0.05,
 }
+
+# mapping
+values_mapping: Mapping[str, Any] = values.copy()
 
 # ! true
 configured_values = config_components_values(
@@ -53,3 +58,19 @@ values_by_formula_state, values_list = configured_values
 
 print("Values by Formula-State (unsorted):", values_by_formula_state)
 print("Configured values (unsorted):", values_list)
+
+# ! mapping
+configured_values = config_components_values(
+    values=values_mapping,
+    components=components,
+    component_key="Formula-State",
+    sort_by_components_order=True,
+)
+
+if configured_values is None:
+    raise ValueError("Could not match all values to the supplied components.")
+
+values_by_formula_state, values_list = configured_values
+
+print("Values by Formula-State (mapping):", values_by_formula_state)
+print("Configured values (mapping):", values_list)
