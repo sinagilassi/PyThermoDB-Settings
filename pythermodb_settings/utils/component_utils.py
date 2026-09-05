@@ -845,7 +845,7 @@ def find_components_by_ids(
 
 
 def config_components_values(
-        values: Dict[str, Any],
+        values: Dict[str, Any] | Mapping[str, Any],
         components: List[Component],
         component_key: Optional[ComponentKey],
         case_sensitive: bool = True,
@@ -856,8 +856,8 @@ def config_components_values(
 
     Parameters
     ----------
-    values : Dict[str, float | int]
-        A dictionary of component IDs and their corresponding values.
+    values : Dict[str, Any] | Mapping[str, Any]
+        A dictionary or mapping of component IDs to their corresponding values.
     components : List[Component]
         A list of Component objects.
     component_key : Optional[ComponentKey], optional
@@ -893,6 +893,7 @@ def config_components_values(
     # component values
     component_values: Dict[str, Any] = {}
 
+    # iterate over the provided values dictionary or mapping
     for comp_id, comp_val in values.items():
         # >>> find component by id
         component_found_ = find_component_by_id(
