@@ -62,6 +62,9 @@ from .quantities import (
 # NOTE: agent
 from .agents import AnnotatedValue
 
+# NOTE: decorators
+from .decorators import CalculationSignature
+
 
 __all__ = [
     "COMPOSITION_METADATA",
@@ -113,5 +116,6 @@ __all__ = [
     "ComponentMasses",
     "ComponentVolumes",
     "ComponentValues",
-    "AnnotatedValue"
+    "AnnotatedValue",
+    "CalculationSignature",
 ]
