@@ -1,10 +1,11 @@
 # import libs
-from rich import print
+# from rich import print
 from typing import Mapping
 from pythermodb_settings.decorators.calculation_info import calculation_info, get_calculation_info, get_calculation_signature
 
 
 @calculation_info(
+    name="calc_ionic_strength_molality",
     description=(
         "Calculate molality-based ionic strength from species "
         "molalities and ionic charges."
@@ -14,7 +15,7 @@ from pythermodb_settings.decorators.calculation_info import calculation_info, ge
         "molalities": "Species molalities [mol/kg]",
         "charges": "Species ionic charge numbers [-]",
     },
-    output={
+    outputs={
         "ionic_strength": "Molality-based ionic strength [mol/kg]",
     },
     notes=(
@@ -39,10 +40,11 @@ info = \
     calc_ionic_strength_molality.__calculation_info__  # type: ignore[attr-defined]
 print(info)
 
+print(info.name)
 print(info.description)
 print(info.equation)
 print(info.inputs)
-print(info.output)
+print(info.outputs)
 print(info.notes)
 print(info.aliases)
 
