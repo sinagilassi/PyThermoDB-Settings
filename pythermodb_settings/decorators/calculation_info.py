@@ -26,23 +26,29 @@ class CalculationInfo(BaseModel):
 
     Attributes
     ----------
+    name : str
+        Name of the calculation function.
     description : str
         Short description of what the function calculates.
     equation : str | None
         Mathematical equation or defining relationship.
     inputs : dict[str, str]
         Semantic descriptions of important function inputs.
-    output : dict[str, str]
+    outputs : dict[str, str]
         Semantic description of the function output.
+    aliases : tuple[str, ...]
+            Names of equivalent or closely related calculation functions.
     notes : tuple[str, ...]
         Assumptions, limitations, usage conditions, or other scientifically relevant notes.
-    aliases : tuple[str, ...]
-        Names of equivalent or closely related calculation functions.
     """
 
     model_config = ConfigDict(
         frozen=True,
         extra="forbid",
+    )
+
+    name: str = Field(
+        description="Name of the calculation function."
     )
 
     description: str = Field(
@@ -62,11 +68,18 @@ class CalculationInfo(BaseModel):
         ),
     )
 
-    output: dict[str, str] = Field(
+    outputs: dict[str, str] = Field(
         default_factory=dict,
         description=(
-            "Semantic description of the function output. "
+            "Semantic description of the function outputs. "
             "Keys should normally match function return value names."
+        ),
+    )
+
+    aliases: tuple[str, ...] = Field(
+        default_factory=tuple,
+        description=(
+            "Names of equivalent or closely related calculation functions."
         ),
     )
 
@@ -78,22 +91,16 @@ class CalculationInfo(BaseModel):
         ),
     )
 
-    aliases: tuple[str, ...] = Field(
-        default_factory=tuple,
-        description=(
-            "Names of equivalent or closely related calculation functions."
-        ),
-    )
-
 # SECTION Calculation Info Decorator
 
 
 def calculation_info(
     *,
+    name: str,
     description: str,
     equation: str | None = None,
     inputs: Mapping[str, str] | None = None,
-    output: Mapping[str, str] | None = None,
+    outputs: Mapping[str, str] | None = None,
     notes: tuple[str, ...] = (),
     aliases: tuple[str, ...] = (),
 ) -> Callable[[Callable[P, R]], Callable[P, R]]:
@@ -108,6 +115,9 @@ def calculation_info(
 
     Parameters
     ----------
+    name:
+        Name of the calculation function.
+
     description:
         Short scientific description of the calculation.
 
@@ -117,15 +127,15 @@ def calculation_info(
     inputs:
         Mapping of function argument names to their semantic descriptions.
 
-    output:
+    outputs:
         Mapping of return-value names to their semantic descriptions.
+
+    aliases:
+        Names of equivalent or closely related calculation functions.
 
     notes:
         Assumptions, limitations, applicability conditions, or other
         relevant scientific information.
-
-    aliases:
-        Names of equivalent or closely related calculation functions.
 
     Returns
     -------
@@ -135,12 +145,13 @@ def calculation_info(
 
     def decorator(func: Callable[P, R]) -> Callable[P, R]:
         info = CalculationInfo(
+            name=name,
             description=description,
             equation=equation,
             inputs=dict(inputs) if inputs is not None else {},
-            output=dict(output) if output is not None else {},
-            notes=notes,
+            outputs=dict(outputs) if outputs is not None else {},
             aliases=aliases,
+            notes=notes,
         )
 
         func.__calculation_info__ = info  # type: ignore[attr-defined]
