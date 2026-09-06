@@ -32,10 +32,8 @@ class AnnotatedValue(BaseModel, Generic[T]):
 
     Attributes
     ----------
-    value : Any
-        The actual returned or calculated value. This may be any Python
-        object, including a scalar, boolean, string, list, dictionary,
-        NumPy array, matrix, or another structured object.
+    value : T
+        The actual returned or calculated value. The type of this value is specified by the generic type variable ``T``.
 
     name : str | None
         Optional name identifying the returned quantity or result, e.g.
