@@ -1,4 +1,6 @@
-from typing import Any
+
+# import libs
+from typing import Generic, TypeVar
 
 from pydantic import (
     BaseModel,
@@ -6,9 +8,12 @@ from pydantic import (
     Field,
 )
 
+# NOTE: Generic type variable for AnnotatedValue
+T = TypeVar("T")
+
 
 # SECTION: Annotated Value Model
-class AnnotatedValue(BaseModel):
+class AnnotatedValue(BaseModel, Generic[T]):
     """
     Structured representation of a returned value with optional descriptive
     metadata for interpretation by users, applications, and LLM-based agents.
@@ -134,7 +139,7 @@ class AnnotatedValue(BaseModel):
         extra="allow",
     )
 
-    value: Any = Field(
+    value: T = Field(
         ...,
         description=(
             "Actual returned or calculated value. This field is required and "
