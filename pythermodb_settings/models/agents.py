@@ -87,13 +87,19 @@ class AnnotatedValue(BaseModel, Generic[T]):
 
     Examples
     --------
+    ``AnnotatedValue`` is generic over ``T``, so it can be parameterized with
+    the concrete type of ``value`` (e.g. ``AnnotatedValue[int]``,
+    ``AnnotatedValue[float]``, ``AnnotatedValue[bool]``,
+    ``AnnotatedValue[dict[str, float]]``) for static type checking, or used
+    without parameterization when the type is inferred or unimportant.
+
     A simple value without additional metadata:
 
-    >>> result = AnnotatedValue(value=42)
+    >>> result = AnnotatedValue[int](value=42)
 
     A boolean result:
 
-    >>> result = AnnotatedValue(
+    >>> result = AnnotatedValue[bool](
     ...     name="converged",
     ...     value=True,
     ...     description="Indicates whether the numerical solver converged.",
@@ -101,7 +107,7 @@ class AnnotatedValue(BaseModel, Generic[T]):
 
     A scientific result:
 
-    >>> result = AnnotatedValue(
+    >>> result = AnnotatedValue[float](
     ...     name="ionic_strength",
     ...     description="Ionic strength calculated on a molality basis.",
     ...     value=0.125,
@@ -111,7 +117,7 @@ class AnnotatedValue(BaseModel, Generic[T]):
 
     A dimensionless result:
 
-    >>> result = AnnotatedValue(
+    >>> result = AnnotatedValue[float](
     ...     name="activity_coefficient",
     ...     description="Activity coefficient of the specified component.",
     ...     value=1.21,
@@ -121,7 +127,7 @@ class AnnotatedValue(BaseModel, Generic[T]):
 
     A structured result:
 
-    >>> result = AnnotatedValue(
+    >>> result = AnnotatedValue[dict[str, float]](
     ...     name="component_molalities",
     ...     description="Calculated molality of each dissolved species.",
     ...     value={
