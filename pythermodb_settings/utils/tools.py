@@ -2,7 +2,7 @@
 import time
 import logging
 from functools import wraps
-from typing import Literal
+from typing import Literal, TypeVar
 from collections.abc import Mapping, Sequence
 from typing import Any, TypedDict
 
@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 ModeType = Literal["silent", "log", "attach"]
+T = TypeVar("T")
 
 # ! ::: Measure Time
 
@@ -79,18 +80,18 @@ def measure_time(func):
 
 
 def to_annotated_value(
-    value: Any,
+    value: T,
     name: str | None = None,
     description: str | None = None,
     unit: str | None = None,
     symbol: str | None = None,
-) -> AnnotatedValue:
+) -> AnnotatedValue[T]:
     """
     Create an AnnotatedValue instance with the given attributes.
 
     Parameters
     ----------
-    value : Any
+    value : T
         The actual returned or calculated value.
     name : str | None, optional
         Optional name identifying the returned quantity or result.
@@ -103,7 +104,7 @@ def to_annotated_value(
 
     Returns
     -------
-    AnnotatedValue
+    AnnotatedValue[T]
         The created AnnotatedValue instance.
     """
     return AnnotatedValue(
