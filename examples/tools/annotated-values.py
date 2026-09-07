@@ -92,6 +92,7 @@ array_result: AnnotatedValue[np.ndarray] = to_annotated_value(
     name="example_array",
     description="An example NumPy array.",
     unit="dimensionless",
+    implementation="Example implementation details.",
 )
 print("\nTyped NumPy array")
 print(array_result.model_dump())
