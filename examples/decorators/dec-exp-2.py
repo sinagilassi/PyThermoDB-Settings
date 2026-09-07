@@ -24,6 +24,10 @@ from pythermodb_settings.decorators.calculation_info import calculation_info, ge
     ),
     aliases=(
         "calc_ionic_strength",
+    ),
+    tags=(
+        "ionic_strength",
+        "molality",
     )
 )
 def calc_ionic_strength_molality(
@@ -47,6 +51,7 @@ print(info.inputs)
 print(info.outputs)
 print(info.notes)
 print(info.aliases)
+print(info.tags)
 
 sig = get_calculation_signature(calc_ionic_strength_molality)
 
