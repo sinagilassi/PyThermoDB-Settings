@@ -40,6 +40,8 @@ class CalculationInfo(BaseModel):
             Names of equivalent or closely related calculation functions.
     notes : tuple[str, ...]
         Assumptions, limitations, usage conditions, or other scientifically relevant notes.
+    tags: tuple[str, ...]
+        Tags associated with the calculation function.
     """
 
     model_config = ConfigDict(
@@ -91,6 +93,13 @@ class CalculationInfo(BaseModel):
         ),
     )
 
+    tags: tuple[str, ...] = Field(
+        default_factory=tuple,
+        description=(
+            "Tags associated with the calculation function."
+        ),
+    )
+
 # SECTION Calculation Info Decorator
 
 
@@ -103,6 +112,7 @@ def calculation_info(
     outputs: Mapping[str, str] | None = None,
     notes: tuple[str, ...] = (),
     aliases: tuple[str, ...] = (),
+    tags: tuple[str, ...] = (),
 ) -> Callable[[Callable[P, R]], Callable[P, R]]:
     """
     Attach machine-readable calculation metadata to a function.
@@ -137,6 +147,9 @@ def calculation_info(
         Assumptions, limitations, applicability conditions, or other
         relevant scientific information.
 
+    tags:
+        Tags associated with the calculation function.
+
     Returns
     -------
     Callable
@@ -152,6 +165,7 @@ def calculation_info(
             outputs=dict(outputs) if outputs is not None else {},
             aliases=aliases,
             notes=notes,
+            tags=tags,
         )
 
         func.__calculation_info__ = info  # type: ignore[attr-defined]
