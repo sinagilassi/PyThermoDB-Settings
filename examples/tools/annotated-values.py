@@ -1,13 +1,13 @@
 # import libs
+import numpy as np
+from pythermodb_settings.utils import to_annotated_value
+from pythermodb_settings.models import AnnotatedValue
 import sys
 from pathlib import Path
 from typing import Any
 from rich import print
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-
-from pythermodb_settings.models import AnnotatedValue
-from pythermodb_settings.utils import to_annotated_value
 
 
 def print_annotated_value(
@@ -84,3 +84,14 @@ component_molalities: AnnotatedValue[dict[str, float]] = to_annotated_value(
 )
 print("\nTyped structured value")
 print(component_molalities.model_dump())
+
+# A NumPy array can also be wrapped as an AnnotatedValue.
+
+array_result: AnnotatedValue[np.ndarray] = to_annotated_value(
+    value=np.array([1.0, 2.0, 3.0]),
+    name="example_array",
+    description="An example NumPy array.",
+    unit="dimensionless",
+)
+print("\nTyped NumPy array")
+print(array_result.model_dump())
