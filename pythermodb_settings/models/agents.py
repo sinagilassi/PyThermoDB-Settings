@@ -1,5 +1,6 @@
 
 # import libs
+import numpy as np
 from typing import Generic, TypeVar
 
 from pydantic import (
@@ -141,6 +142,11 @@ class AnnotatedValue(BaseModel, Generic[T]):
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
         extra="allow",
+        json_encoders={
+            np.ndarray: lambda value: value.tolist(),
+            np.integer: int,
+            np.floating: float,
+        },
     )
 
     value: T = Field(
