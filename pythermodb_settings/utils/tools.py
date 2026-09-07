@@ -85,6 +85,7 @@ def to_annotated_value(
     description: str | None = None,
     unit: str | None = None,
     symbol: str | None = None,
+    implementation: str | None = None,
 ) -> AnnotatedValue[T]:
     """
     Create an AnnotatedValue instance with the given attributes.
@@ -101,6 +102,8 @@ def to_annotated_value(
         Optional unit associated with the returned value.
     symbol : str | None, optional
         Optional scientific or mathematical symbol associated with the returned value.
+    implementation : str | None, optional
+        Optional description of the implementation details or method used to obtain the returned value.
 
     Returns
     -------
@@ -113,6 +116,7 @@ def to_annotated_value(
         description=description,
         unit=unit,
         symbol=symbol,
+        implementation=implementation,
     )
 
 
