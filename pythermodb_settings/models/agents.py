@@ -61,6 +61,10 @@ class AnnotatedValue(BaseModel, Generic[T]):
         ``"I"`` for ionic strength, or ``"gamma"`` for an activity
         coefficient.
 
+    implementation : str | None
+        Optional description of the implementation details or method used to
+        obtain the returned value.
+
     Notes
     -----
     ``AnnotatedValue`` is intended as a generic agent-facing result wrapper.
@@ -193,5 +197,13 @@ class AnnotatedValue(BaseModel, Generic[T]):
             "Optional scientific or mathematical symbol associated with the "
             "returned value, e.g. 'H' for enthalpy, 'I' for ionic strength, "
             "or 'gamma' for an activity coefficient."
+        ),
+    )
+
+    implementation: str | None = Field(
+        default=None,
+        description=(
+            "Optional description of the implementation details or method used "
+            "to obtain the returned value."
         ),
     )
