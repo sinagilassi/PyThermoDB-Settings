@@ -19,6 +19,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "numpy>=2.4.6",
     "pydantic",
     "pyyaml",
 ]
