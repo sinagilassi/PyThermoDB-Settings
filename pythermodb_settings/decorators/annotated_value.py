@@ -53,7 +53,7 @@ def annotated_value(
             description=bound.arguments.get("description"),
             unit=bound.arguments.get("unit"),
             symbol=bound.arguments.get("symbol"),
-            aliases=bound.arguments.get("aliases"),
+            implementation=bound.arguments.get("implementation"),
         )
 
     return wrapper
