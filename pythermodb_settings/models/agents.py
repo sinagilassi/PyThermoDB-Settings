@@ -61,8 +61,8 @@ class AnnotatedValue(BaseModel, Generic[T]):
         ``"I"`` for ionic strength, or ``"gamma"`` for an activity
         coefficient.
 
-    implementation : str | None
-        Optional description of the implementation details or method used to
+    aliases : str | None
+        Optional description of the aliases details or method used to
         obtain the returned value.
 
     Notes
@@ -200,10 +200,10 @@ class AnnotatedValue(BaseModel, Generic[T]):
         ),
     )
 
-    implementation: str | None = Field(
+    aliases: str | None = Field(
         default=None,
         description=(
-            "Optional description of the implementation details or method used "
+            "Optional description of the aliases details or method used "
             "to obtain the returned value."
         ),
     )
