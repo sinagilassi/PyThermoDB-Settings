@@ -9,7 +9,8 @@ from ..models import (
     ComponentKey,
     Mixture,
     MixtureIdentity,
-    MixtureKey
+    MixtureKey,
+    CustomProp,
 )
 from .tools import measure_time
 
@@ -844,12 +845,41 @@ def find_components_by_ids(
 # ! ::: Configure Component Values by order and component key
 
 
+def _extract_values(value: Any) -> Any:
+    """
+    Extract the underlying value from a given input, handling various types such as CustomProp, objects with a 'value' attribute, and dictionaries with a 'value' key.
+
+    Parameters
+    ----------
+    value : Any
+        The input value to extract from.
+
+    Returns
+    -------
+    Any
+        The extracted value.
+    """
+    if isinstance(value, CustomProp):
+        # ? CustomProp
+        return value.value
+    elif getattr(value, "value", None) is not None:
+        # ? Object with a 'value' attribute
+        return value.value
+    elif isinstance(value, dict) and "value" in value:
+        # ? Dictionary with a 'value' key
+        return value["value"]
+    else:
+        # ? Fallback for other types
+        return value
+
+
 def config_components_values(
         values: Dict[str, Any] | Mapping[str, Any],
         components: List[Component],
         component_key: Optional[ComponentKey],
         case_sensitive: bool = True,
         sort_by_components_order: bool = True,
+        extract_values: bool = True,
 ) -> Optional[Tuple[Dict[str, Any], List[Any]]]:
     """
     Configure values for multiple components based on their identifiers in the component list and an optional component key.
@@ -866,6 +896,8 @@ def config_components_values(
         Whether the component IDs are case-sensitive. Defaults to True.
     sort_by_components_order : bool, optional
         Whether to sort the configured values by the order of components in the component list. Defaults to True.
+    extract_values : bool, optional
+        Whether to extract the underlying values from CustomProp objects or similar structures. Defaults to True.
 
     Returns
     -------
@@ -943,7 +975,11 @@ def config_components_values(
         # index
         component_values[comp_id].pop("index", None)
         # value
-        component_values[comp_id] = component_values[comp_id]["value"]
+        if extract_values:
+            val_ = _extract_values(component_values[comp_id]["value"])
+        else:
+            val_ = component_values[comp_id]["value"]
+        component_values[comp_id] = val_
 
     # NOTE: list
     component_values_list = list(component_values.values())
@@ -959,6 +995,7 @@ def extract_components_values(
     component_key: Optional[ComponentKey] = None,
     case_sensitive: bool = True,
     sort_by_components_order: bool = True,
+    extract_values: bool = True,
 ) -> Optional[Tuple[Dict[str, Any], List[Any]]]:
     """
     Extract components values for the specified attribute from the list of components.
@@ -975,6 +1012,8 @@ def extract_components_values(
         Whether the component identifiers are case-sensitive, by default True.
     sort_by_components_order : bool, optional
         Whether to sort the output by the order of components, by default True.
+    extract_values : bool, optional
+        Whether to extract the underlying values from CustomProp objects or similar structures, by default True.
 
     Returns
     -------
@@ -1009,7 +1048,8 @@ def extract_components_values(
         components=components,
         component_key=component_key,
         sort_by_components_order=sort_by_components_order,
-        case_sensitive=case_sensitive
+        case_sensitive=case_sensitive,
+        extract_values=extract_values
     )
 
 # SECTION: Validation Functions
