@@ -54,6 +54,7 @@ def to_amounts_by_order(
         sort_by_components_order: bool = True,
         output_unit: Optional[str] = None,
         unit_conversion_fn: UnitConversionFn | None = None,
+        extract_values: bool = True,
 ) -> Optional[tuple[Dict[str, float], List[float]]]:
     """
     Convert component amounts to the requested output unit and reorder them based on the order of the components list.
@@ -74,6 +75,8 @@ def to_amounts_by_order(
         The unit to which CustomProp component amounts should be converted. Default is None.
     unit_conversion_fn : UnitConversionFn | None, optional
         A function to convert units of component amounts. Default is None.
+    extract_values : bool, optional
+        Whether to extract the underlying values from CustomProp objects or similar structures, by default True.
 
     Returns
     -------
@@ -93,7 +96,8 @@ def to_amounts_by_order(
         components=components,
         component_key=component_key,
         case_sensitive=case_sensitive,
-        sort_by_components_order=sort_by_components_order
+        sort_by_components_order=sort_by_components_order,
+        extract_values=extract_values,
     )
     # >> check
     if not ordered_component:
