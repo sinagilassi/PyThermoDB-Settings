@@ -2,7 +2,7 @@
 from collections.abc import Mapping
 from typing import Any, Dict
 from pythermodb_settings.utils import config_components_values
-from pythermodb_settings.models import Component
+from pythermodb_settings.models import Component, CustomProp
 import sys
 from pathlib import Path
 from rich import print
@@ -22,6 +22,12 @@ values: Dict[str, Any] = {
     "Water-l": 0.70,
     "C2H6O-l": 0.25,
     "Sodium-aq": 0.05,
+}
+
+values_props: Dict[str, CustomProp] = {
+    "Water-l": CustomProp(value=0.70, unit="mol/L"),
+    "C2H6O-l": CustomProp(value=0.25, unit="mol/L"),
+    "Sodium-aq": CustomProp(value=0.05, unit="mol/L")
 }
 
 # mapping
@@ -74,3 +80,20 @@ values_by_formula_state, values_list = configured_values
 
 print("Values by Formula-State (mapping):", values_by_formula_state)
 print("Configured values (mapping):", values_list)
+
+# ! custom properties
+configured_values = config_components_values(
+    values=values_props,
+    components=components,
+    component_key="Formula-State",
+    sort_by_components_order=True,
+    extract_values=True,
+)
+
+if configured_values is None:
+    raise ValueError("Could not match all values to the supplied components.")
+
+values_by_formula_state, values_list = configured_values
+
+print("Values by Formula-State (custom properties):", values_by_formula_state)
+print("Configured values (custom properties):", values_list)
