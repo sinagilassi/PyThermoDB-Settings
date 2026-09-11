@@ -62,6 +62,11 @@ from .validators import (
     same_shape,
 )
 
+# util
+from .util import (
+    extract_values,
+)
+
 # all
 __all__ = [
     "create_component_id",
@@ -107,5 +112,7 @@ __all__ = [
     "non_negative",
     "positive",
     "fractions",
-    "same_shape"
+    "same_shape",
+    # util
+    "extract_values"
 ]

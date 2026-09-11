@@ -48,7 +48,7 @@ def to_amounts(
 
 
 def to_values(
-        data: Mapping[str, Any] | Dict[str, Any],
+        data: Mapping[str, CustomProp | float | int] | Dict[str, CustomProp | float | int],
         output_unit: Optional[str] = None,
         unit_conversion_fn: UnitConversionFn | None = None
 ) -> Dict[str, float]:
@@ -57,7 +57,7 @@ def to_values(
 
     Parameters
     ----------
-    data : Mapping[str, Any] | Dict[str, Any]
+    data : Mapping[str, CustomProp | float | int] | Dict[str, CustomProp | float | int]
         A dictionary mapping component names to amounts. Numeric values are assumed to already be in output_unit.
     output_unit : str, optional
         The unit to which CustomProp component amounts should be converted. Default is None.

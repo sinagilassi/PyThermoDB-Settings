@@ -1,9 +1,10 @@
 # import libs
 from collections.abc import Mapping
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 from pythermodb_settings.models import CustomProp
 # locals
 from ..models.units import UnitConversionFn
+from .util import extract_values
 
 
 # ! ::: Check if units match
