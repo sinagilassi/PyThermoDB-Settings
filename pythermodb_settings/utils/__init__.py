@@ -50,6 +50,7 @@ from .quantity import (
     to_scalar,
     to_dict,
     to_list,
+    to_values,
 )
 
 # validators
@@ -101,6 +102,7 @@ __all__ = [
     "to_scalar",
     "to_dict",
     "to_list",
+    "to_values",
     "non_empty",
     "non_negative",
     "positive",

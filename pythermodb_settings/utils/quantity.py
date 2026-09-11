@@ -1,7 +1,7 @@
 # import libs
 import logging
 from collections.abc import Mapping, Sequence
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Any
 # locals
 from ..models.components import Component, ComponentKey
 from ..models.quantities import ComponentAmounts, ScalarValue, ComponentValues
@@ -40,6 +40,37 @@ def to_amounts(
     """
     return to_custom_props_mapping(
         values=component_amounts,
+        to_unit=output_unit,
+        unit_conversion_fn=unit_conversion_fn
+    )
+
+# ! ::: Extract values from mapping
+
+
+def to_values(
+        data: Mapping[str, Any] | Dict[str, Any],
+        output_unit: Optional[str] = None,
+        unit_conversion_fn: UnitConversionFn | None = None
+) -> Dict[str, float]:
+    """
+    Extract values from a mapping and convert them to the requested output unit.
+
+    Parameters
+    ----------
+    data : Mapping[str, Any] | Dict[str, Any]
+        A dictionary mapping component names to amounts. Numeric values are assumed to already be in output_unit.
+    output_unit : str, optional
+        The unit to which CustomProp component amounts should be converted. Default is None.
+    unit_conversion_fn : UnitConversionFn | None, optional
+        A function to convert units of component amounts. Default is None.
+
+    Returns
+    -------
+    Dict[str, float]
+        A dictionary mapping component names to their respective amounts as floats.
+    """
+    return to_custom_props_mapping(
+        values=data,
         to_unit=output_unit,
         unit_conversion_fn=unit_conversion_fn
     )
