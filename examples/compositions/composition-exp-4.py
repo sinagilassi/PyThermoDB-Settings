@@ -1,4 +1,7 @@
 # import libs
+from pythermodb_settings.utils import to_amounts, to_amounts_by_order, to_values
+from pythermodb_settings.models import Component, CustomProp
+from pycuc import convert_from_to
 import sys
 from pathlib import Path
 
@@ -6,10 +9,6 @@ from rich import print
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
-
-from pycuc import convert_from_to
-from pythermodb_settings.models import Component, CustomProp
-from pythermodb_settings.utils import to_amounts, to_amounts_by_order
 
 
 # =======================================
@@ -156,3 +155,17 @@ missing_component_result = to_amounts_by_order(
 )
 print("[bold red]missing component result[/bold red]")
 print(missing_component_result)
+
+# ! to_values
+to_values_result = to_values(
+    data=unordered_amounts,
+)
+print("[bold yellow]to_values result no conversion[/bold yellow]")
+print(to_values_result)
+
+to_values_result = to_values(
+    data=unordered_amounts,
+    output_unit="kg",
+)
+print("[bold blue]to_values result[/bold blue]")
+print(to_values_result)
