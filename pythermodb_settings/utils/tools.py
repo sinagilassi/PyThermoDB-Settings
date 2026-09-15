@@ -7,6 +7,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any, TypedDict
 
 from ..models import CustomProperty, CustomProp, AnnotatedValue
+from ..references.quantities import registry
 
 # NOTE: logger setup
 logging.basicConfig(level=logging.INFO)
@@ -86,6 +87,7 @@ def to_annotated_value(
     unit: str | None = None,
     symbol: str | None = None,
     implementation: str | None = None,
+    check_symbol_in_registry: bool = False,
 ) -> AnnotatedValue[T]:
     """
     Create an AnnotatedValue instance with the given attributes.
@@ -104,12 +106,26 @@ def to_annotated_value(
         Optional scientific or mathematical symbol associated with the returned value.
     implementation : str | None, optional
         Optional description of the implementation details or method used to obtain the returned value.
+    check_symbol_in_registry : bool, optional
+        If True, resolve ``name`` and ``description`` from the quantity
+        registry when ``symbol`` uniquely matches a registered quantity.
+        If the symbol is missing, unknown, or ambiguous, the provided
+        ``name`` and ``description`` are used unchanged.
 
     Returns
     -------
     AnnotatedValue[T]
         The created AnnotatedValue instance.
     """
+    if check_symbol_in_registry and symbol is not None:
+        matches = registry.find_by_symbol(symbol)
+
+        if len(matches) == 1:
+            quantity = matches[0]
+            name = quantity.key
+            description = quantity.description
+            symbol = quantity.symbol
+
     return AnnotatedValue(
         value=value,
         name=name,
