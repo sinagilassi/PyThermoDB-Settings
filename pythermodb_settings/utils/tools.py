@@ -125,6 +125,12 @@ def to_annotated_value(
             name = quantity.key
             description = quantity.description
             symbol = quantity.symbol
+        else:
+            # Symbol did not uniquely match a registered quantity
+            logger.warning(
+                "Symbol '%s' did not uniquely match a registered quantity. Using provided name and description.",
+                symbol,
+            )
 
     return AnnotatedValue(
         value=value,
