@@ -100,15 +100,15 @@ print("\nTyped NumPy array")
 print(array_result.model_dump())
 
 # ! check registry
-# return as provided
+# ? return as provided
 print_annotated_value(
     "Enthalpy of formation (from registry)",
     value=-285.83,
     symbol="Hf",
-    check_symbol_in_registry=True,
+    check_symbol_in_registry=False,
 )
 
-# return resolved from registry
+# ? return resolved from registry
 print_annotated_value(
     "Enthalpy of formation (resolved from registry)",
     value=-285.83,
