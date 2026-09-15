@@ -1,0 +1,506 @@
+quantities:
+  temperature:
+    symbol: T
+    description: System temperature
+    domain: thermodynamics
+    quantity_type: temperature
+
+  pressure:
+    symbol: P
+    description: System pressure
+    domain: thermodynamics
+    quantity_type: pressure
+
+  volume:
+    symbol: V
+    description: Generic volume quantity for a system, phase, or control volume
+    domain: thermodynamics
+    quantity_type: volume
+
+  component_volume:
+    symbol: V_i
+    description: Volume associated with component i, when physically meaningful
+    domain: thermodynamics
+    quantity_type: volume
+    index: component
+
+  total_volume:
+    symbol: V_TOT
+    description: Total volume of the complete system
+    domain: thermodynamics
+    quantity_type: volume
+    basis: total
+
+  molar_volume:
+    symbol: MoVo
+    description: Volume per mole
+    domain: thermodynamics
+    quantity_type: volume
+    basis: molar
+
+  specific_volume:
+    symbol: SpVo
+    description: Volume per unit mass
+    domain: thermodynamics
+    quantity_type: volume
+    basis: mass
+
+  component_moles:
+    symbol: n_i
+    description: Amount of component i
+    domain: composition
+    quantity_type: amount
+    index: component
+
+  total_moles:
+    symbol: n_TOT
+    description: Total amount of substance in the system
+    domain: composition
+    quantity_type: amount
+    basis: total
+
+  mass:
+    symbol: Ma
+    description: Generic mass quantity
+    domain: thermodynamics
+    quantity_type: mass
+
+  component_mass:
+    symbol: Ma_i
+    description: Mass of component i
+    domain: composition
+    quantity_type: mass
+    index: component
+
+  total_mass:
+    symbol: Ma_TOT
+    description: Total mass of the complete system
+    domain: thermodynamics
+    quantity_type: mass
+    basis: total
+
+  molecular_weight:
+    symbol: MW
+    description: Molecular or molar mass of a pure component
+    domain: thermodynamics
+    quantity_type: molecular_weight
+
+  mixture_molecular_weight:
+    symbol: MW_MIX
+    description: Average molecular weight of a mixture
+    domain: thermodynamics
+    quantity_type: molecular_weight
+    basis: mixture
+
+  gas_constant:
+    symbol: R
+    description: Universal gas constant used in thermodynamic relations
+    domain: thermodynamics
+    quantity_type: constant
+
+  compressibility_factor:
+    symbol: Z
+    description: Real-gas compressibility factor
+    domain: thermodynamics
+    quantity_type: dimensionless
+
+  critical_temperature:
+    symbol: Tc
+    description: Critical temperature
+    domain: thermodynamics
+    quantity_type: temperature
+    basis: critical
+
+  critical_pressure:
+    symbol: Pc
+    description: Critical pressure
+    domain: thermodynamics
+    quantity_type: pressure
+    basis: critical
+
+  critical_molar_volume:
+    symbol: Vc
+    description: Critical molar volume
+    domain: thermodynamics
+    quantity_type: volume
+    basis: critical_molar
+
+  critical_compressibility_factor:
+    symbol: Zc
+    description: Compressibility factor at the critical point
+    domain: thermodynamics
+    quantity_type: dimensionless
+    basis: critical
+
+  acentric_factor:
+    symbol: AcFa
+    description: Pitzer acentric factor
+    domain: thermodynamics
+    quantity_type: dimensionless
+
+  reduced_temperature:
+    symbol: Tr
+    description: Temperature normalized by critical temperature
+    domain: thermodynamics
+    quantity_type: dimensionless
+    basis: reduced
+
+  reduced_pressure:
+    symbol: Pr
+    description: Pressure normalized by critical pressure
+    domain: thermodynamics
+    quantity_type: dimensionless
+    basis: reduced
+
+  vapor_pressure:
+    symbol: VaPr
+    description: Saturation or vapor pressure of a pure component
+    domain: phase_equilibrium
+    quantity_type: pressure
+    basis: saturation
+
+  saturation_temperature:
+    symbol: SaT
+    description: Temperature corresponding to saturation at a pressure
+    domain: phase_equilibrium
+    quantity_type: temperature
+    basis: saturation
+
+  density:
+    symbol: rho
+    description: Generic mass density
+    domain: thermodynamics
+    quantity_type: density
+
+  liquid_density:
+    symbol: rho_LIQ
+    description: Liquid mass density
+    domain: thermodynamics
+    quantity_type: density
+    phase: liquid
+
+  gas_density:
+    symbol: rho_GAS
+    description: Gas mass density
+    domain: thermodynamics
+    quantity_type: density
+    phase: gas
+
+  ideal_gas_density:
+    symbol: rho_IG
+    description: Ideal-gas density
+    domain: thermodynamics
+    quantity_type: density
+    phase: ideal_gas
+
+  mole_fraction:
+    symbol: MoFr
+    description: Component mole fraction
+    domain: composition
+    quantity_type: fraction
+    basis: mole
+
+  mass_fraction:
+    symbol: MaFr
+    description: Component mass fraction
+    domain: composition
+    quantity_type: fraction
+    basis: mass
+
+  volume_fraction:
+    symbol: VoFr
+    description: Component volume fraction
+    domain: composition
+    quantity_type: fraction
+    basis: volume
+
+  molarity:
+    symbol: Molar
+    description: Amount of solute per solution volume
+    domain: composition
+    quantity_type: concentration
+    basis: molar_volume
+    aliases:
+      - amount_concentration
+
+  molality:
+    symbol: Molal
+    description: Amount of solute per mass of solvent
+    domain: composition
+    quantity_type: concentration
+    basis: molal
+
+  ionic_strength:
+    symbol: IoSt
+    description: Generic ionic strength
+    domain: electrolyte
+    quantity_type: ionic_strength
+
+  ionic_strength_molarity:
+    symbol: IoSt_MOLAR
+    description: Ionic strength using molar concentration basis
+    domain: electrolyte
+    quantity_type: ionic_strength
+    basis: molarity
+
+  ionic_strength_molality:
+    symbol: IoSt_MOLAL
+    description: Ionic strength using molality basis
+    domain: electrolyte
+    quantity_type: ionic_strength
+    basis: molality
+
+  enthalpy:
+    symbol: En
+    description: Generic enthalpy
+    domain: thermodynamics
+    quantity_type: energy
+
+  entropy:
+    symbol: Ent
+    description: Generic entropy
+    domain: thermodynamics
+    quantity_type: entropy
+
+  gibbs_free_energy:
+    symbol: GiFrEn
+    description: Generic Gibbs free energy
+    domain: thermodynamics
+    quantity_type: energy
+
+  internal_energy:
+    symbol: InEn
+    description: Internal energy
+    domain: thermodynamics
+    quantity_type: energy
+
+  helmholtz_free_energy:
+    symbol: HeFrEn
+    description: Helmholtz free energy
+    domain: thermodynamics
+    quantity_type: energy
+
+  heat_capacity_at_constant_pressure:
+    symbol: Cp
+    description: Heat capacity at constant pressure
+    domain: thermodynamics
+    quantity_type: heat_capacity
+    basis: constant_pressure
+
+  heat_capacity_at_constant_volume:
+    symbol: Cv
+    description: Heat capacity at constant volume
+    domain: thermodynamics
+    quantity_type: heat_capacity
+    basis: constant_volume
+
+  activity:
+    symbol: Act
+    description: Thermodynamic activity
+    domain: thermodynamics
+    quantity_type: activity
+
+  activity_coefficient:
+    symbol: AcCo
+    description: Activity coefficient
+    domain: thermodynamics
+    quantity_type: dimensionless
+
+  fugacity:
+    symbol: Fug
+    description: Fugacity
+    domain: phase_equilibrium
+    quantity_type: pressure_like
+
+  fugacity_coefficient:
+    symbol: FuCo
+    description: Fugacity coefficient
+    domain: phase_equilibrium
+    quantity_type: dimensionless
+
+  chemical_potential:
+    symbol: ChPo
+    description: Chemical potential
+    domain: thermodynamics
+    quantity_type: energy_per_mole
+
+  equilibrium_constant:
+    symbol: EqK
+    description: Thermodynamic equilibrium constant
+    domain: reaction
+    quantity_type: equilibrium_constant
+
+  log_equilibrium_constant:
+    symbol: lnEqK
+    description: Natural logarithm of equilibrium constant
+    domain: reaction
+    quantity_type: dimensionless
+
+  reaction_quotient:
+    symbol: RxQu
+    description: Reaction quotient
+    domain: reaction
+    quantity_type: reaction_quotient
+
+  reaction_extent:
+    symbol: RxEx
+    description: Extent of reaction
+    domain: reaction
+    quantity_type: amount
+
+  reaction_enthalpy:
+    symbol: dEn_RXN
+    description: Reaction enthalpy
+    domain: reaction
+    quantity_type: energy_change
+    basis: reaction
+
+  standard_reaction_enthalpy:
+    symbol: dEn_RXN_STD
+    description: Standard-state reaction enthalpy
+    domain: reaction
+    quantity_type: energy_change
+    basis: reaction_standard
+
+  reaction_entropy:
+    symbol: dEnt_RXN
+    description: Reaction entropy
+    domain: reaction
+    quantity_type: entropy_change
+    basis: reaction
+
+  standard_reaction_entropy:
+    symbol: dEnt_RXN_STD
+    description: Standard-state reaction entropy
+    domain: reaction
+    quantity_type: entropy_change
+    basis: reaction_standard
+
+  reaction_gibbs_energy:
+    symbol: dGiFrEn_RXN
+    description: Reaction Gibbs-energy change
+    domain: reaction
+    quantity_type: energy_change
+    basis: reaction
+
+  standard_reaction_gibbs_energy:
+    symbol: dGiFrEn_RXN_STD
+    description: Standard-state reaction Gibbs-energy change
+    domain: reaction
+    quantity_type: energy_change
+    basis: reaction_standard
+
+  molar_flow_rate:
+    symbol: MoFl
+    description: Molar flow rate
+    domain: process
+    quantity_type: flow_rate
+    basis: molar
+
+  mass_flow_rate:
+    symbol: MaFl
+    description: Mass flow rate
+    domain: process
+    quantity_type: flow_rate
+    basis: mass
+
+  volumetric_flow_rate:
+    symbol: VoFl
+    description: Volumetric flow rate
+    domain: process
+    quantity_type: flow_rate
+    basis: volume
+
+  viscosity:
+    symbol: Vis
+    description: Generic dynamic viscosity
+    domain: transport
+    quantity_type: viscosity
+
+  thermal_conductivity:
+    symbol: ThCon
+    description: Generic thermal conductivity
+    domain: transport
+    quantity_type: thermal_conductivity
+
+  diffusivity:
+    symbol: Dif
+    description: Generic diffusion coefficient
+    domain: transport
+    quantity_type: diffusivity
+
+  binary_diffusivity:
+    symbol: Dif_ij
+    description: Binary diffusion coefficient
+    domain: transport
+    quantity_type: diffusivity
+    index: pair
+
+  surface_tension:
+    symbol: SuTe
+    description: Surface or interfacial tension
+    domain: transport
+    quantity_type: surface_tension
+
+  bubble_temperature:
+    symbol: T_BUB
+    description: Bubble-point temperature
+    domain: phase_equilibrium
+    quantity_type: temperature
+    basis: bubble_point
+
+  dew_temperature:
+    symbol: T_DEW
+    description: Dew-point temperature
+    domain: phase_equilibrium
+    quantity_type: temperature
+    basis: dew_point
+
+  bubble_pressure:
+    symbol: P_BUB
+    description: Bubble-point pressure
+    domain: phase_equilibrium
+    quantity_type: pressure
+    basis: bubble_point
+
+  dew_pressure:
+    symbol: P_DEW
+    description: Dew-point pressure
+    domain: phase_equilibrium
+    quantity_type: pressure
+    basis: dew_point
+
+  equilibrium_ratio:
+    symbol: K_i
+    description: Component phase-equilibrium ratio
+    domain: phase_equilibrium
+    quantity_type: dimensionless
+    index: component
+
+  henry_constant:
+    symbol: HenCo
+    description: Henry's-law constant
+    domain: phase_equilibrium
+    quantity_type: henry_constant
+
+  attraction_parameter:
+    symbol: a
+    description: Cubic-EOS attractive parameter
+    domain: eos
+    quantity_type: model_parameter
+    namespace: cubic_eos
+
+  covolume_parameter:
+    symbol: b
+    description: Cubic-EOS co-volume parameter
+    domain: eos
+    quantity_type: model_parameter
+    namespace: cubic_eos
+
+  binary_interaction_parameter:
+    symbol: k_ij
+    description: Cubic-EOS binary interaction parameter
+    domain: eos
+    quantity_type: model_parameter
+    namespace: cubic_eos
+    index: pair
