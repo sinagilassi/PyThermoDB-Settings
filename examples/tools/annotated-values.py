@@ -17,6 +17,7 @@ def print_annotated_value(
         description: str | None = None,
         unit: str | None = None,
         symbol: str | None = None,
+        check_symbol_in_registry: bool = False,
 ) -> None:
     print(f"\n{title}")
     print(
@@ -26,6 +27,7 @@ def print_annotated_value(
             description=description,
             unit=unit,
             symbol=symbol,
+            check_symbol_in_registry=check_symbol_in_registry,
         ).model_dump()
     )
 
@@ -96,3 +98,20 @@ array_result: AnnotatedValue[np.ndarray] = to_annotated_value(
 )
 print("\nTyped NumPy array")
 print(array_result.model_dump())
+
+# ! check registry
+# return as provided
+print_annotated_value(
+    "Enthalpy of formation (from registry)",
+    value=-285.83,
+    symbol="Hf",
+    check_symbol_in_registry=True,
+)
+
+# return resolved from registry
+print_annotated_value(
+    "Enthalpy of formation (resolved from registry)",
+    value=-285.83,
+    symbol="EnFo",
+    check_symbol_in_registry=True,
+)
