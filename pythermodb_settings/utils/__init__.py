@@ -67,6 +67,9 @@ from .util import (
     extract_values,
 )
 
+# quantity metadata tools
+from .quantity_meta import quantity_meta
+
 # all
 __all__ = [
     "create_component_id",
@@ -114,5 +117,7 @@ __all__ = [
     "fractions",
     "same_shape",
     # util
-    "extract_values"
+    "extract_values",
+    # quantity meta tools
+    "quantity_meta",
 ]

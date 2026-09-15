@@ -65,6 +65,9 @@ from .agents import AnnotatedValue
 # NOTE: decorators
 from .decorators import CalculationSignature
 
+# NOTE: quantity metadata
+from .quantity import QuantityDefinition, QuantityRef, QuantityRegistryData
+
 
 __all__ = [
     "COMPOSITION_METADATA",
@@ -118,4 +121,8 @@ __all__ = [
     "ComponentValues",
     "AnnotatedValue",
     "CalculationSignature",
+    # quantity metadata
+    "QuantityDefinition",
+    "QuantityRef",
+    "QuantityRegistryData",
 ]
