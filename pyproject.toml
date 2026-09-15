@@ -34,4 +34,7 @@ include = ["pythermodb_settings*"]
 exclude = ["tests*", "examples*", "docs*"]
 
 [tool.setuptools.package-data]
-"pythermodb_settings" = ["data/**/*"]
+"pythermodb_settings" = [
+    "data/**/*",
+    "configs/*.yml",
+]
