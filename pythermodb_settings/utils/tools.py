@@ -47,33 +47,79 @@ def measure_time(func):
         # Extract mode safely
         mode: ModeType = kwargs.pop("mode", "silent")
 
+        if mode not in ("silent", "log", "attach"):
+            raise ValueError("mode must be 'silent', 'log', or 'attach'")
+
+        # *** measure time for non-silent modes
+        if mode == "silent":
+            return func(*args, **kwargs)
+
+        # NOTE: measure the CPU time of the function execution
         start = time.process_time()
         result = func(*args, **kwargs)
         end = time.process_time()
 
         elapsed = end - start
 
-        if mode == "silent":
-            return result
-
+        # *** mode == "log"
         if mode == "log":
             logger.info(
                 f"{func.__name__} executed in {elapsed:.6f} seconds (CPU time)")
             return result
 
-        if mode == "attach":
+        # *** mode == "attach"
+        logger.info(
+            f"{func.__name__} executed in {elapsed:.6f} seconds (CPU time)")
+        if isinstance(result, dict):
+            result["computation_time"] = elapsed
+        else:
+            result = {
+                "result": result,
+                "computation_time": elapsed
+            }
+        return result
+    return wrapper
+
+# ! ::: Timed Decorator
+
+
+def timed(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        mode: ModeType = kwargs.pop("mode", "silent")
+
+        if mode not in ("silent", "log", "attach"):
+            raise ValueError(
+                "mode must be 'silent', 'log', or 'attach'"
+            )
+
+        # *** measure time for non-silent modes
+        if mode == "silent":
+            return func(*args, **kwargs)
+
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        elapsed = time.perf_counter() - start
+
+        # *** mode == "log"
+        if mode == "log":
             logger.info(
-                f"{func.__name__} executed in {elapsed:.6f} seconds (CPU time)")
-            if isinstance(result, dict):
-                result["computation_time"] = elapsed
-            else:
-                result = {
-                    "result": result,
-                    "computation_time": elapsed
-                }
+                "%s executed in %.6f seconds",
+                func.__name__,
+                elapsed,
+            )
             return result
 
-        raise ValueError("mode must be 'silent', 'log', or 'attach'")
+        # *** mode == "attach"
+        if isinstance(result, dict):
+            result["computation_time"] = elapsed
+            return result
+
+        return {
+            "result": result,
+            "computation_time": elapsed,
+        }
+
     return wrapper
 
 
