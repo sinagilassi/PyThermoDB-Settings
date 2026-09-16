@@ -21,6 +21,7 @@ from .component_utils import (
 # tools
 from .tools import (
     measure_time,
+    timed,
     to_annotated_value,
     get_unit,
 )
@@ -79,6 +80,7 @@ __all__ = [
     "set_component_state",
     "set_components_state",
     "measure_time",
+    "timed",
     "to_annotated_value",
     "get_unit",
     "set_feed_specification",
