@@ -1,7 +1,11 @@
 # import
-
+import logging
+from collections.abc import Mapping
 from typing import Any
 from ..models import CustomProp
+
+# NOTE: logger setup
+logger = logging.getLogger(__name__)
 
 # SECTION: Value Extraction
 
@@ -45,3 +49,35 @@ def extract_values(
         return float(value)
     else:
         return None
+
+
+# SECTION: extract mapping/dict by key
+def extract_by_key(
+        mapping: Mapping,
+        key: str,
+) -> Any:
+    """
+    Extract the value associated with a given key from a dictionary.
+
+    Parameters
+    ----------
+    mapping : Mapping
+        The mapping to extract the value from.
+    key : str
+        The key whose value needs to be extracted.
+
+    Returns
+    -------
+    Any
+        The value associated with the key, or raise a KeyError if the key is not present.
+
+    Raises
+    ------
+    KeyError
+        If the key is not present in the mapping.
+    """
+    try:
+        return mapping[key]
+    except KeyError as e:
+        logger.error("Key '%s' not found in mapping.", key)
+        raise e
