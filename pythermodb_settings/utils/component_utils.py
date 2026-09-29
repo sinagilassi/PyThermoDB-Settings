@@ -12,13 +12,12 @@ from ..models import (
     MixtureKey,
     CustomProp,
 )
-from .tools import measure_time
 
 # NOTE: logger
 logger = logging.getLogger(__name__)
 
 
-# ::: Create Component Identifiers :::
+# ! ::: Create Component Identifiers :::
 def create_component_id(
     component: Component,
     separator_symbol: str = '-'
@@ -151,6 +150,65 @@ def set_component_id(
         )
         raise e
 
+# ! ::: Create Component List with Identifiers :::
+
+
+def create_component_ids(
+        components: List[Component],
+        component_keys: Optional[List[ComponentKey]] = None,
+        separator_symbol: str = '-',
+        case: Literal['lower', 'upper'] | None = None,
+        sort_alphabetically: bool = False,
+):
+    """
+    Create a dictionary of component identifiers for a list of components based on specified component keys.
+
+    Parameters
+    ----------
+    components : List[Component]
+        The list of components to generate identifiers for.
+    component_keys : Optional[List[ComponentKey]], optional
+        The list of component keys to use for generating identifiers, by default None.
+    separator_symbol : str, optional
+        The symbol used to separate different parts of the component identifier, by default '-'.
+    case : Literal['lower', 'upper'] | None, optional
+        The case to apply to the component identifiers, by default None.
+    sort_alphabetically : bool, optional
+        Whether to sort the component identifiers alphabetically, by default False.
+
+    Returns
+    -------
+    Dict[str, List[str]]
+        A dictionary where the keys are component keys and the values are lists of component identifiers.
+    """
+    # SECTION: Validation
+    if component_keys is None:
+        component_keys = [
+            'Name', 'Formula', 'Name-State', 'Formula-State',
+        ]
+
+    # SECTION: Build component list with keys
+    res: Dict[str, List[str]] = {}
+
+    # iterate over each component key
+    for key in component_keys:
+        res_ = [
+            set_component_id(
+                component=component,
+                component_key=key,
+                separator_symbol=separator_symbol,
+                case=case
+            ) for component in components
+        ]
+
+        # >> check
+        if sort_alphabetically:
+            res_ = sorted(res_)
+
+        res[key] = res_
+
+    return res
+
 
 def create_binary_mixture_id(
     component_1: Component,
@@ -238,7 +296,8 @@ def create_mixture_id(
     components: list[Component],
     mixture_key: MixtureKey = "Name",
     delimiter: str = "|",
-    case: Literal['lower', 'upper', None] = None
+    case: Literal['lower', 'upper', None] = None,
+    sort_alphabetically: bool = True,
 ) -> str:
     """Create a unique mixture ID based on a list of components (sorted alphabetically).
 
@@ -252,6 +311,8 @@ def create_mixture_id(
         Delimiter to separate the components in the ID, by default "|".
     case : Literal['lower', 'upper', None], optional
         Convert the identifier to lower or upper case, by default 'lower'.
+    sort_alphabetically : bool, optional
+        Whether to sort the component IDs alphabetically before joining, by default True.
 
     Returns
     -------
@@ -301,7 +362,10 @@ def create_mixture_id(
 
         # SECTION: create unique mixture ID (sorted to ensure uniqueness)
         # ! sorted alphabetically
-        mixture_id = delimiter.join(sorted(component_ids))
+        if sort_alphabetically:
+            mixture_id = delimiter.join(sorted(component_ids))
+        else:
+            mixture_id = delimiter.join(component_ids)
 
         # strip
         mixture_id = mixture_id.strip()
@@ -318,6 +382,53 @@ def create_mixture_id(
         return mixture_id
     except Exception as e:
         logging.error(f"Error in create_mixture_id: {e}")
+        raise
+
+# ! ::: Create Mixture Ids
+
+
+def create_mixture_ids(
+        components: List[Component],
+        mixture_keys: List[ComponentKey],
+        delimiter: str = '|',
+        case: Optional[Literal['lower', 'upper']] = None,
+        sort_alphabetically: bool = True,
+) -> Dict[str, str]:
+    """
+    Create mixture IDs for a list of components based on specified mixture keys.
+
+    Parameters
+    ----------
+    components : List[Component]
+        The list of components to generate mixture IDs for.
+    mixture_keys : List[ComponentKey]
+        The list of component keys to use for generating mixture IDs.
+    delimiter : str, optional
+        The symbol used to separate different parts of the mixture ID, by default '|'.
+    case : Literal['lower', 'upper'], optional
+        The case to apply to the mixture IDs, by default None.
+    sort_alphabetically : bool, optional
+        Whether to sort the component IDs alphabetically before joining, by default True.
+
+    Returns
+    -------
+    Dict[str, str]
+        A dictionary mapping each mixture key to its corresponding mixture ID.
+    """
+    try:
+        mixture_ids: Dict[str, str] = {
+            key: create_mixture_id(
+                components=components,
+                mixture_key=key,
+                delimiter=delimiter,
+                case=case,
+                sort_alphabetically=sort_alphabetically
+            )
+            for key in mixture_keys
+        }
+        return mixture_ids
+    except Exception as e:
+        logging.error(f"Error in create_mixture_ids: {e}")
         raise
 
 
@@ -381,6 +492,9 @@ def set_components_state(
 
 
 # SECTION: map component key
+
+
+# ! ::: Build Component Mapper :::
 def build_component_mapper(
         component: Component,
         component_keys: Optional[List[ComponentKey]] = None
