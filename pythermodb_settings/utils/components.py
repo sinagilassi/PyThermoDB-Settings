@@ -1,9 +1,11 @@
 # alias for component utilities
 from .component_utils import (
     create_component_id,
+    create_component_ids,
     set_component_id,
     create_binary_mixture_id,
     create_mixture_id,
+    create_mixture_ids,
     set_component_state,
     set_components_state,
     build_component_mapper,
@@ -22,9 +24,11 @@ from .component_utils import (
 
 __all__ = [
     "create_component_id",
+    "create_component_ids",
     "set_component_id",
     "create_binary_mixture_id",
     "create_mixture_id",
+    "create_mixture_ids",
     "set_component_state",
     "set_components_state",
     "build_component_mapper",
