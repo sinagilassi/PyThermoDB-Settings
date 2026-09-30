@@ -387,7 +387,7 @@ def create_mixture_id(
 # ! ::: Create Mixture Ids
 
 
-def create_mixture_ids(
+def create_mixture_ids_with_keys(
         components: List[Component],
         mixture_keys: List[ComponentKey],
         delimiter: str = '|',
