@@ -1,7 +1,7 @@
 # import libs
 from typing import List
 from pythermodb_settings.models import Component, MixtureKey
-from pythermodb_settings.utils import create_component_ids, create_mixture_ids
+from pythermodb_settings.utils import create_component_ids, create_mixture_ids_with_keys
 from rich import print
 
 # NOTE: create a component
@@ -35,7 +35,7 @@ mixture_keys: List[MixtureKey] = [
 
 # NOTE: create mixture ids based on the specified mixture keys
 # ! as is
-mixture_ids_as_is = create_mixture_ids(
+mixture_ids_as_is = create_mixture_ids_with_keys(
     components=components,
     mixture_keys=mixture_keys,
     sort_alphabetically=False
@@ -45,7 +45,7 @@ print(mixture_ids_as_is)
 
 
 # ! sort alphabetically
-mixture_ids = create_mixture_ids(
+mixture_ids = create_mixture_ids_with_keys(
     components=components,
     mixture_keys=mixture_keys,
     sort_alphabetically=True
