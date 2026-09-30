@@ -153,7 +153,7 @@ def set_component_id(
 # ! ::: Create Component List with Identifiers :::
 
 
-def create_component_ids(
+def create_component_ids_with_keys(
         components: List[Component],
         component_keys: Optional[List[ComponentKey]] = None,
         separator_symbol: str = '-',
